@@ -46,11 +46,11 @@ struct DashboardView: View {
                         // ── Top banner: date + weather ──
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Today")
-                                    .font(.caption)
-                                    .foregroundStyle(Color.inkBrown.opacity(0.6))
+//                                Text("Today")
+//                                    .font(.caption)
+//                                    .foregroundStyle(Color.inkBrown.opacity(0.6))
                                 Text(Date().formatted(.dateTime.weekday(.wide).month().day()))
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
                             }
                             Spacer()

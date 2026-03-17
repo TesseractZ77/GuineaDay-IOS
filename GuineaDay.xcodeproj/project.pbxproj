@@ -33,30 +33,9 @@
 		3DB1D02A2F3EAF7000BFB5CE /* GuineaDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuineaDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3DB370242F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"GoogleService-Info.plist",
-			);
-			target = 3DB1D01F2F3EAF7000BFB5CE /* GuineaDayTests */;
-		};
-		3DB370252F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"GoogleService-Info.plist",
-			);
-			target = 3DB1D0292F3EAF7000BFB5CE /* GuineaDayUITests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3DB1D0102F3EAF6D00BFB5CE /* GuineaDay */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3DB370242F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayTests" target */,
-				3DB370252F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayUITests" target */,
-			);
 			path = GuineaDay;
 			sourceTree = "<group>";
 		};
