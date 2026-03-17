@@ -1,0 +1,614 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3DB1D0602F3EBF5000BFB5CE /* ColorTokensKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3DB1D0212F3EAF7000BFB5CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DB1D0062F3EAF6D00BFB5CE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DB1D00D2F3EAF6D00BFB5CE;
+			remoteInfo = GuineaDay;
+		};
+		3DB1D02B2F3EAF7000BFB5CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DB1D0062F3EAF6D00BFB5CE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3DB1D00D2F3EAF6D00BFB5CE;
+			remoteInfo = GuineaDay;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3DB1D00E2F3EAF6D00BFB5CE /* GuineaDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GuineaDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DB1D0202F3EAF7000BFB5CE /* GuineaDayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuineaDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DB1D02A2F3EAF7000BFB5CE /* GuineaDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuineaDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3DB370242F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = 3DB1D01F2F3EAF7000BFB5CE /* GuineaDayTests */;
+		};
+		3DB370252F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = 3DB1D0292F3EAF7000BFB5CE /* GuineaDayUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		3DB1D0102F3EAF6D00BFB5CE /* GuineaDay */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3DB370242F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayTests" target */,
+				3DB370252F68CD94000AFC03 /* Exceptions for "GuineaDay" folder in "GuineaDayUITests" target */,
+			);
+			path = GuineaDay;
+			sourceTree = "<group>";
+		};
+		3DB1D0232F3EAF7000BFB5CE /* GuineaDayTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GuineaDayTests;
+			sourceTree = "<group>";
+		};
+		3DB1D02D2F3EAF7000BFB5CE /* GuineaDayUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GuineaDayUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3DB1D00B2F3EAF6D00BFB5CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3DB1D0602F3EBF5000BFB5CE /* ColorTokensKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D01D2F3EAF7000BFB5CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D0272F3EAF7000BFB5CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3DB1D0052F3EAF6D00BFB5CE = {
+			isa = PBXGroup;
+			children = (
+				3DB1D0102F3EAF6D00BFB5CE /* GuineaDay */,
+				3DB1D0232F3EAF7000BFB5CE /* GuineaDayTests */,
+				3DB1D02D2F3EAF7000BFB5CE /* GuineaDayUITests */,
+				3DB1D00F2F3EAF6D00BFB5CE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3DB1D00F2F3EAF6D00BFB5CE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3DB1D00E2F3EAF6D00BFB5CE /* GuineaDay.app */,
+				3DB1D0202F3EAF7000BFB5CE /* GuineaDayTests.xctest */,
+				3DB1D02A2F3EAF7000BFB5CE /* GuineaDayUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3DB1D00D2F3EAF6D00BFB5CE /* GuineaDay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DB1D0342F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDay" */;
+			buildPhases = (
+				3DB1D00A2F3EAF6D00BFB5CE /* Sources */,
+				3DB1D00B2F3EAF6D00BFB5CE /* Frameworks */,
+				3DB1D00C2F3EAF6D00BFB5CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3DB1D0102F3EAF6D00BFB5CE /* GuineaDay */,
+			);
+			name = GuineaDay;
+			packageProductDependencies = (
+				3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */,
+			);
+			productName = GuineaDay;
+			productReference = 3DB1D00E2F3EAF6D00BFB5CE /* GuineaDay.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3DB1D01F2F3EAF7000BFB5CE /* GuineaDayTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DB1D0372F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDayTests" */;
+			buildPhases = (
+				3DB1D01C2F3EAF7000BFB5CE /* Sources */,
+				3DB1D01D2F3EAF7000BFB5CE /* Frameworks */,
+				3DB1D01E2F3EAF7000BFB5CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3DB1D0222F3EAF7000BFB5CE /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3DB1D0232F3EAF7000BFB5CE /* GuineaDayTests */,
+			);
+			name = GuineaDayTests;
+			packageProductDependencies = (
+			);
+			productName = GuineaDayTests;
+			productReference = 3DB1D0202F3EAF7000BFB5CE /* GuineaDayTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3DB1D0292F3EAF7000BFB5CE /* GuineaDayUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3DB1D03A2F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDayUITests" */;
+			buildPhases = (
+				3DB1D0262F3EAF7000BFB5CE /* Sources */,
+				3DB1D0272F3EAF7000BFB5CE /* Frameworks */,
+				3DB1D0282F3EAF7000BFB5CE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3DB1D02C2F3EAF7000BFB5CE /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3DB1D02D2F3EAF7000BFB5CE /* GuineaDayUITests */,
+			);
+			name = GuineaDayUITests;
+			packageProductDependencies = (
+			);
+			productName = GuineaDayUITests;
+			productReference = 3DB1D02A2F3EAF7000BFB5CE /* GuineaDayUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3DB1D0062F3EAF6D00BFB5CE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					3DB1D00D2F3EAF6D00BFB5CE = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					3DB1D01F2F3EAF7000BFB5CE = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 3DB1D00D2F3EAF6D00BFB5CE;
+					};
+					3DB1D0292F3EAF7000BFB5CE = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 3DB1D00D2F3EAF6D00BFB5CE;
+					};
+				};
+			};
+			buildConfigurationList = 3DB1D0092F3EAF6D00BFB5CE /* Build configuration list for PBXProject "GuineaDay" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3DB1D0052F3EAF6D00BFB5CE;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3DB1D00F2F3EAF6D00BFB5CE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3DB1D00D2F3EAF6D00BFB5CE /* GuineaDay */,
+				3DB1D01F2F3EAF7000BFB5CE /* GuineaDayTests */,
+				3DB1D0292F3EAF7000BFB5CE /* GuineaDayUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3DB1D00C2F3EAF6D00BFB5CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D01E2F3EAF7000BFB5CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D0282F3EAF7000BFB5CE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3DB1D00A2F3EAF6D00BFB5CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D01C2F3EAF7000BFB5CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3DB1D0262F3EAF7000BFB5CE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3DB1D0222F3EAF7000BFB5CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DB1D00D2F3EAF6D00BFB5CE /* GuineaDay */;
+			targetProxy = 3DB1D0212F3EAF7000BFB5CE /* PBXContainerItemProxy */;
+		};
+		3DB1D02C2F3EAF7000BFB5CE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3DB1D00D2F3EAF6D00BFB5CE /* GuineaDay */;
+			targetProxy = 3DB1D02B2F3EAF7000BFB5CE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3DB1D0322F3EAF7000BFB5CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3DB1D0332F3EAF7000BFB5CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3DB1D0352F3EAF7000BFB5CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GuineaDay/Preview Content\"";
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDay;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3DB1D0362F3EAF7000BFB5CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GuineaDay/Preview Content\"";
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDay;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3DB1D0382F3EAF7000BFB5CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDayTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GuineaDay.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GuineaDay";
+			};
+			name = Debug;
+		};
+		3DB1D0392F3EAF7000BFB5CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDayTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GuineaDay.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GuineaDay";
+			};
+			name = Release;
+		};
+		3DB1D03B2F3EAF7000BFB5CE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDayUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GuineaDay;
+			};
+			name = Debug;
+		};
+		3DB1D03C2F3EAF7000BFB5CE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDayUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GuineaDay;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3DB1D0092F3EAF6D00BFB5CE /* Build configuration list for PBXProject "GuineaDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DB1D0322F3EAF7000BFB5CE /* Debug */,
+				3DB1D0332F3EAF7000BFB5CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DB1D0342F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DB1D0352F3EAF7000BFB5CE /* Debug */,
+				3DB1D0362F3EAF7000BFB5CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DB1D0372F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDayTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DB1D0382F3EAF7000BFB5CE /* Debug */,
+				3DB1D0392F3EAF7000BFB5CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3DB1D03A2F3EAF7000BFB5CE /* Build configuration list for PBXNativeTarget "GuineaDayUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DB1D03B2F3EAF7000BFB5CE /* Debug */,
+				3DB1D03C2F3EAF7000BFB5CE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/metasidd/ColorTokensKit-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */;
+			productName = ColorTokensKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 3DB1D0062F3EAF6D00BFB5CE /* Project object */;
+}
