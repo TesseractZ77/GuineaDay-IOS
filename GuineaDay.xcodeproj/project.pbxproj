@@ -36,9 +36,22 @@
 		3DB1D02A2F3EAF7000BFB5CE /* GuineaDayUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GuineaDayUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3D1EF0752F6BBA5000E0274E /* Exceptions for "GuineaDay" folder in "GuineaDay" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3DB1D00D2F3EAF6D00BFB5CE /* GuineaDay */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3DB1D0102F3EAF6D00BFB5CE /* GuineaDay */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3D1EF0752F6BBA5000E0274E /* Exceptions for "GuineaDay" folder in "GuineaDay" target */,
+			);
 			path = GuineaDay;
 			sourceTree = "<group>";
 		};
@@ -419,12 +432,18 @@
 				DEVELOPMENT_TEAM = 88L9LS8QPA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
+				INFOPLIST_FILE = GuineaDay/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "GuineaDay uses the camera so you can take photos directly for the gallery and guinea pig profiles.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "GuineaDay uses your location to show the current weather on the home screen.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "GuineaDay saves photos to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "GuineaDay uses your photo library to add memories to the gallery and set profile pictures for your guinea pigs.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -450,12 +469,18 @@
 				DEVELOPMENT_TEAM = 88L9LS8QPA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
+				INFOPLIST_FILE = GuineaDay/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "GuineaDay uses the camera so you can take photos directly for the gallery and guinea pig profiles.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "GuineaDay uses your location to show the current weather on the home screen.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "GuineaDay saves photos to your photo library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "GuineaDay uses your photo library to add memories to the gallery and set profile pictures for your guinea pigs.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
