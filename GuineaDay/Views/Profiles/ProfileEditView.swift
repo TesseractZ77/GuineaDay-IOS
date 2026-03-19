@@ -5,6 +5,8 @@ import PhotosUI
 struct ProfileEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var firestore: FirestoreService
+
     
     let guineaPig: GuineaPig?
     
@@ -132,16 +134,18 @@ struct ProfileEditView: View {
         }
         
         if let guineaPig {
-            guineaPig.name = name
-            guineaPig.birthDate = birthDate
-            guineaPig.breed = breed
-            guineaPig.gender = gender
-            guineaPig.profileImageAssetName = profileImageAssetName
-        } else {
-            let newPig = GuineaPig(name: name, birthDate: birthDate, breed: breed, gender: gender)
-            newPig.profileImageAssetName = profileImageAssetName
-            modelContext.insert(newPig)
-        }
-        dismiss()
+                guineaPig.name = name
+                guineaPig.birthDate = birthDate
+                guineaPig.breed = breed
+                guineaPig.gender = gender
+                guineaPig.profileImageAssetName = profileImageAssetName
+                Task { try? await firestore.savePig(guineaPig) }  // ← Firestore sync (update)
+            } else {
+                let newPig = GuineaPig(name: name, birthDate: birthDate, breed: breed, gender: gender)
+                newPig.profileImageAssetName = profileImageAssetName
+                modelContext.insert(newPig)
+                Task { try? await firestore.savePig(newPig) }  // ← Firestore sync (create)
+            }
+            dismiss()
     }
 }

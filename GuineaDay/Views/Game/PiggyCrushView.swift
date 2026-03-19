@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 // MARK: - Models
 
@@ -32,6 +34,10 @@ struct PiggyCrushView: View {
     @State private var combo = 0          // chain reaction counter
     @State private var lastComboScore = 0 // shown in combo flash
     @AppStorage("pcBestScore") private var bestScore: Int = 0
+    @EnvironmentObject var firestore: FirestoreService
+    @State private var householdScores: [String: Int] = [:]   // uid → score
+    @State private var scoresListener: ListenerRegistration?
+
 
 
     // Cell size fills screen minus padding
@@ -59,18 +65,34 @@ struct PiggyCrushView: View {
                             .transition(.scale.combined(with: .opacity))
                     }
                     gridView
-                    Text("🏆 Best: \(bestScore)")
+                    let householdBest = householdScores.values.max() ?? bestScore
+                    Text("🏆 Best: \(householdBest)")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(Color.inkBrown.opacity(0.5))
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 16)
+
                     Spacer()
                 }
             }
         }
-        .onAppear { initGrid() }
+        .onAppear {
+            initGrid()
+            // Start listening to household scores
+            scoresListener = firestore.listenToScores { scores in
+                householdScores = scores
+            }
+            // Push your current best score on appear
+            if bestScore > 0, let uid = Auth.auth().currentUser?.uid {
+                Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: bestScore) }
+            }
+        }
+        .onDisappear {
+            scoresListener?.remove()
+        }
         .animation(.spring(response: 0.25), value: combo)
     }
+
 
     // MARK: - Header
 
@@ -196,7 +218,14 @@ struct PiggyCrushView: View {
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkBrown, lineWidth: 2))
 
             Button {
-                if score > bestScore { bestScore = score }
+                let finalScore = score  // ← capture BEFORE resetting to 0
+                if score > bestScore {
+                    bestScore = score
+                    // Save new best to Firestore
+                    if let uid = Auth.auth().currentUser?.uid {
+                        Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: score) }
+                    }
+                }
                 score = 0; movesLeft = totalMoves; combo = 0
                 gameOver = false; matchedPos = []; selected = nil
                 initGrid()
@@ -358,3 +387,4 @@ struct PiggyCrushView: View {
         }
     }
 }
+#Preview { PiggyCrushView() }

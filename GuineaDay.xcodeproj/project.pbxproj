@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D1EEF242F6B630A00E0274E /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1EEF232F6B630A00E0274E /* FirebaseAuth */; };
+		3D1EEF262F6B630A00E0274E /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1EEF252F6B630A00E0274E /* FirebaseFirestore */; };
+		3D1EEF282F6B630A00E0274E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 3D1EEF272F6B630A00E0274E /* FirebaseStorage */; };
 		3DB1D0602F3EBF5000BFB5CE /* ColorTokensKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +60,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DB1D0602F3EBF5000BFB5CE /* ColorTokensKit in Frameworks */,
+				3D1EEF282F6B630A00E0274E /* FirebaseStorage in Frameworks */,
+				3D1EEF242F6B630A00E0274E /* FirebaseAuth in Frameworks */,
+				3D1EEF262F6B630A00E0274E /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +124,9 @@
 			name = GuineaDay;
 			packageProductDependencies = (
 				3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */,
+				3D1EEF232F6B630A00E0274E /* FirebaseAuth */,
+				3D1EEF252F6B630A00E0274E /* FirebaseFirestore */,
+				3D1EEF272F6B630A00E0274E /* FirebaseStorage */,
 			);
 			productName = GuineaDay;
 			productReference = 3DB1D00E2F3EAF6D00BFB5CE /* GuineaDay.app */;
@@ -203,6 +212,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */,
+				3D1EEF222F6B630A00E0274E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3DB1D00F2F3EAF6D00BFB5CE /* Products */;
@@ -402,10 +412,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = GuineaDay/GuineaDay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GuineaDay/Preview Content\"";
-				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				DEVELOPMENT_TEAM = 88L9LS8QPA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
@@ -419,7 +430,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDay;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kkland.GuineaDay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -432,10 +443,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = GuineaDay/GuineaDay.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"GuineaDay/Preview Content\"";
-				DEVELOPMENT_TEAM = VAHRAM4NQW;
+				DEVELOPMENT_TEAM = 88L9LS8QPA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Needed for hand tracking game";
@@ -449,7 +461,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tesseractz77.GuineaDay;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kkland.GuineaDay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -571,6 +583,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3D1EEF222F6B630A00E0274E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.11.0;
+			};
+		};
 		3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/metasidd/ColorTokensKit-Swift";
@@ -582,6 +602,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		3D1EEF232F6B630A00E0274E /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3D1EEF222F6B630A00E0274E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		3D1EEF252F6B630A00E0274E /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3D1EEF222F6B630A00E0274E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		3D1EEF272F6B630A00E0274E /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3D1EEF222F6B630A00E0274E /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		3DB1D05F2F3EBF5000BFB5CE /* ColorTokensKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3DB1D05E2F3EBF5000BFB5CE /* XCRemoteSwiftPackageReference "ColorTokensKit-Swift" */;

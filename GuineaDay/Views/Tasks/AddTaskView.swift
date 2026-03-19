@@ -4,6 +4,7 @@ import SwiftData
 struct AddTaskView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var firestore: FirestoreService
     
     @State private var title = ""
     @State private var dueDate = Date()
@@ -72,6 +73,7 @@ struct AddTaskView: View {
             priority: priority
         )
         modelContext.insert(newTask)
+        Task { try? await firestore.addTask(newTask) }  // ← Firestore sync
         dismiss()
     }
 }

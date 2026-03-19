@@ -1,18 +1,18 @@
 import SwiftUI
 import SwiftData
+import FirebaseCore
 
 @main
 struct GuineaDayApp: App {
+    
+    // Configure Firebase as early as possible
+    init() {
+        FirebaseApp.configure()
+    }
+    
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            TaskItem.self,
-            GuineaPig.self,
-            WeightLog.self,
-            Photo.self
-        ])
-        // For a completely standalone offline app, we use local persistent storage
+        let schema = Schema([TaskItem.self, GuineaPig.self, WeightLog.self, Photo.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
@@ -22,7 +22,7 @@ struct GuineaDayApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
         .modelContainer(sharedModelContainer)
     }

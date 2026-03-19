@@ -3,6 +3,7 @@ import SwiftData
 
 @Model
 final class TaskItem {
+    var id: UUID          // ← NEW: stable ID for Firestore
     var title: String
     var dueDate: Date
     var isCompleted: Bool
@@ -10,8 +11,9 @@ final class TaskItem {
     var priority: String
     var createdAt: Date
     var completedAt: Date?
-    
+
     init(title: String, dueDate: Date, category: String, priority: String) {
+        self.id = UUID()  // ← NEW
         self.title = title
         self.dueDate = dueDate
         self.isCompleted = false
@@ -20,6 +22,7 @@ final class TaskItem {
         self.createdAt = Date()
     }
 }
+
 
 @Model
 final class GuineaPig {

@@ -5,6 +5,8 @@ struct DashboardView: View {
     @AppStorage("selectedMascot") private var selectedMascot: String = "kui"
         @State private var showMascotPicker = false
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var session = AppSession.shared
+    @State private var codeCopied = false
     @Query private var tasks: [TaskItem]
     @Query private var pigs: [GuineaPig]
     @Query private var photos: [Photo]
@@ -125,6 +127,7 @@ struct DashboardView: View {
                         }
                         .padding(.horizontal)
 
+
                         // ── Quick tips ──
                         VStack(alignment: .leading, spacing: 12) {
                             ChiikawaSectionHeader(title: "Piggy Tips", color: .mintGreen, icon: "lightbulb.fill")
@@ -139,6 +142,38 @@ struct DashboardView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .chiikawaCard(color: .chiikawaWhite, radius: 24)
                         .padding(.horizontal)
+                        
+                        // ── Invite code card ──
+                        if let code = session.inviteCode {
+                            HStack(spacing: 12) {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text("Invite Code")
+                                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        .foregroundColor(.inkBrown.opacity(0.6))
+                                    Text(code)
+                                        .font(.system(size: 22, weight: .black, design: .monospaced))
+                                        .foregroundColor(.inkBrown)
+                                        .tracking(4)
+                                }
+                                Spacer()
+                                Button {
+                                    UIPasteboard.general.string = code
+                                    withAnimation { codeCopied = true }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        withAnimation { codeCopied = false }
+                                    }
+                                } label: {
+                                    Image(systemName: codeCopied ? "checkmark.circle.fill" : "doc.on.doc.fill")
+                                        .font(.system(size: 22))
+                                        .foregroundColor(codeCopied ? .mintGreen : .inkBrown)
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .chiikawaCard(color: .lavenderPurple.opacity(0.4), radius: 18)
+                            .padding(.horizontal)
+                        }
+
 
                         // Bottom padding for floating tab bar
                         Spacer().frame(height: 90)

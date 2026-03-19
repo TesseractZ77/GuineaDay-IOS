@@ -5,6 +5,8 @@ import Charts
 struct WeightLogView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var guineaPig: GuineaPig
+    @EnvironmentObject var firestore: FirestoreService
+
 
     // @Query keeps the list reactive — filter to this pig in Swift
     @Query(sort: \WeightLog.date, order: .reverse) private var allLogs: [WeightLog]
@@ -203,6 +205,7 @@ struct WeightLogView: View {
         if !guineaPig.weightLogs.contains(where: { $0.persistentModelID == log.persistentModelID }) {
             guineaPig.weightLogs.append(log)
         }
+        Task { try? await firestore.addWeightLog(log, pigId: guineaPig.id) }  // ← Firestore sync
         withAnimation {
             newWeight = 0
             newDate = Date()
@@ -210,10 +213,15 @@ struct WeightLogView: View {
         }
     }
 
+
     private func deleteLog(_ log: WeightLog) {
+        let logId = log.id
+        let pigId = guineaPig.id
         withAnimation {
             guineaPig.weightLogs.removeAll { $0.persistentModelID == log.persistentModelID }
             modelContext.delete(log)
         }
+        Task { try? await firestore.deleteWeightLog(id: logId, pigId: pigId) }  // ← Firestore sync
     }
+
 }
