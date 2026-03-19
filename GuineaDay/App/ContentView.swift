@@ -38,6 +38,7 @@ enum AppTab: Int, CaseIterable {
 // MARK: - Main ContentView
 struct ContentView: View {
     @State private var selectedTab: AppTab = .home
+    
 
     var body: some View {
         ZStack(alignment: .bottom) {

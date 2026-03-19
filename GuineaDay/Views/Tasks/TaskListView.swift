@@ -4,6 +4,7 @@ import SwiftData
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskItem.dueDate) private var tasks: [TaskItem]
+    @EnvironmentObject var firestore: FirestoreService
     @State private var showingAddTask = false
 
     var pending:   [TaskItem] { tasks.filter { !$0.isCompleted } }
@@ -65,7 +66,9 @@ struct TaskListView: View {
     }
 
     private func deleteTask(_ task: TaskItem) {
+        let id = task.id
         withAnimation { modelContext.delete(task) }
+        Task { try? await firestore.deleteTask(id: id) }  // ← Firestore sync
     }
 
     @ViewBuilder
@@ -82,6 +85,7 @@ struct TaskListView: View {
 // MARK: - Task Row
 struct TaskRow: View {
     @Bindable var task: TaskItem
+    @EnvironmentObject var firestore: FirestoreService
     let onDelete: () -> Void
 
     var stripeColor: Color {
@@ -106,6 +110,7 @@ struct TaskRow: View {
                         task.isCompleted.toggle()
                         task.completedAt = task.isCompleted ? Date() : nil
                     }
+                    Task { try? await firestore.updateTask(task) }  // ← Firestore sync
                 }) {
                     Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 22, weight: .bold))

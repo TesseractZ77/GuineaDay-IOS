@@ -5,6 +5,8 @@ import PhotosUI
 struct GalleryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Photo.dateTaken, order: .reverse) private var photos: [Photo]
+    @EnvironmentObject var firestore: FirestoreService
+
 
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var zoomedPhoto: Photo?
@@ -107,13 +109,18 @@ struct GalleryView: View {
     private func savePhoto(_ image: UIImage) {
         let filename = UUID().uuidString + ".jpg"
         if let saved = ImageStorageService.shared.saveImage(image, name: filename) {
-            modelContext.insert(Photo(filename: saved))
+            let photo = Photo(filename: saved)
+            modelContext.insert(photo)
+            Task { try? await firestore.addPhoto(photo) }  // ← Firestore sync
         }
     }
 
+
     private func deletePhoto(_ photo: Photo) {
+        let id = photo.id
         ImageStorageService.shared.deleteImage(filename: photo.filename)
         modelContext.delete(photo)
+        Task { try? await firestore.deletePhoto(id: id) }  // ← Firestore sync
     }
 }
 
