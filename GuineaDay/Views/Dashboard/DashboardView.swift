@@ -161,7 +161,7 @@ struct DashboardView: View {
                         if let code = session.inviteCode {
                             HStack(spacing: 12) {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text("Invite Code")
+                                    Text("Household Code")
                                         .font(.system(size: 11, weight: .bold, design: .rounded))
                                         .foregroundColor(.inkBrown.opacity(0.6))
                                     Text(code)
