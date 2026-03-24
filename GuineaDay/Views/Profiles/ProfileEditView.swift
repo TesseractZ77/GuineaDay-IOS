@@ -31,9 +31,7 @@ struct ProfileEditView: View {
         _gender = State(initialValue: guineaPig?.gender ?? "Boar")
         _profileImageAssetName = State(initialValue: guineaPig?.profileImageAssetName)
         
-        if let imageName = guineaPig?.profileImageAssetName {
-            _selectedImage = State(initialValue: ImageStorageService.shared.loadImage(filename: imageName))
-        }
+        // selectedImage stays nil — existing URL photos are displayed via AsyncImage in the view
     }
     
     var body: some View {
@@ -47,12 +45,28 @@ struct ProfileEditView: View {
                             Spacer()
                             PhotosPicker(selection: $selectedItem, matching: .images) {
                                 if let selectedImage {
+                                    // Newly picked image (not yet uploaded)
                                     Image(uiImage: selectedImage)
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 120, height: 120)
                                         .clipShape(Circle())
                                         .overlay(Circle().stroke(Color.inkBrown, lineWidth: 3))
+                                } else if let urlStr = profileImageAssetName, let url = URL(string: urlStr) {
+                                    // Existing photo stored as Firebase Storage URL
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .success(let img):
+                                            img.resizable().scaledToFill()
+                                                .frame(width: 120, height: 120)
+                                                .clipShape(Circle())
+                                                .overlay(Circle().stroke(Color.inkBrown, lineWidth: 3))
+                                        default:
+                                            Circle().fill(Color.usagiYellow)
+                                                .frame(width: 120, height: 120)
+                                                .overlay(ProgressView())
+                                        }
+                                    }
                                 } else {
                                     VStack {
                                         Image(systemName: "photo.badge.plus")
@@ -121,31 +135,30 @@ struct ProfileEditView: View {
     }
     
     private func saveProfile() {
-        if let newImage = selectedImage {
-            // Give it a generic filename
-            let filename = UUID().uuidString + ".jpg"
-            if let savedFilename = ImageStorageService.shared.saveImage(newImage, name: filename) {
-                // delete old one if updating
-                if let oldFilename = profileImageAssetName {
-                    ImageStorageService.shared.deleteImage(filename: oldFilename)
+        Task {
+            // If a new image was picked, upload to Firebase Storage first
+            if let newImage = selectedImage {
+                let path = "profiles/\(UUID().uuidString).jpg"
+                if let url = try? await StorageService.shared.uploadImage(
+                    newImage, householdId: firestore.householdId, name: path) {
+                    profileImageAssetName = url  // ← store Firebase Storage URL
                 }
-                profileImageAssetName = savedFilename
             }
-        }
-        
-        if let guineaPig {
+
+            if let guineaPig {
                 guineaPig.name = name
                 guineaPig.birthDate = birthDate
                 guineaPig.breed = breed
                 guineaPig.gender = gender
                 guineaPig.profileImageAssetName = profileImageAssetName
-                Task { try? await firestore.savePig(guineaPig) }  // ← Firestore sync (update)
+                try? await firestore.savePig(guineaPig)
             } else {
                 let newPig = GuineaPig(name: name, birthDate: birthDate, breed: breed, gender: gender)
                 newPig.profileImageAssetName = profileImageAssetName
                 modelContext.insert(newPig)
-                Task { try? await firestore.savePig(newPig) }  // ← Firestore sync (create)
+                try? await firestore.savePig(newPig)
             }
             dismiss()
+        }
     }
 }

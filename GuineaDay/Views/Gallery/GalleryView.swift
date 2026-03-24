@@ -7,7 +7,6 @@ struct GalleryView: View {
     @Query(sort: \Photo.dateTaken, order: .reverse) private var photos: [Photo]
     @EnvironmentObject var firestore: FirestoreService
 
-
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var zoomedPhoto: Photo?
 
@@ -59,20 +58,33 @@ struct GalleryView: View {
                         } else {
                             LazyVGrid(columns: columns, spacing: 12) {
                                 ForEach(photos) { photo in
-                                    if let img = ImageStorageService.shared.loadImage(filename: photo.filename) {
-                                        Image(uiImage: img)
-                                            .resizable().scaledToFill()
-                                            .frame(width: 100, height: 100)
-                                            .clipShape(RoundedRectangle(cornerRadius: 18))
-                                            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.inkBrown, lineWidth: 3))
-                                            .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 2, y: 3)
-                                            .onTapGesture { zoomedPhoto = photo }
-                                            .contextMenu {
-                                                Button(role: .destructive) { deletePhoto(photo) }
-                                                    label: { Label("Delete", systemImage: "trash") }
+                                    Group {
+                                        if photo.filename.hasPrefix("http") {
+                                            // New photos: load from Firebase Storage URL
+                                            AsyncImage(url: URL(string: photo.filename)) { phase in
+                                                switch phase {
+                                                case .success(let img): img.resizable().scaledToFill()
+                                                default: Color.blushPink.overlay(Image(systemName: "photo").foregroundColor(.inkBrown.opacity(0.4)))
+                                                }
                                             }
+                                        } else if let img = ImageStorageService.shared.loadImage(filename: photo.filename) {
+                                            // Old photos: load from local storage (physical phone only)
+                                            Image(uiImage: img).resizable().scaledToFill()
+                                        } else {
+                                            Color.blushPink.overlay(Image(systemName: "photo").foregroundColor(.inkBrown.opacity(0.4)))
+                                        }
+                                    }
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                                    .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.inkBrown, lineWidth: 3))
+                                    .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 2, y: 3)
+                                    .onTapGesture { zoomedPhoto = photo }
+                                    .contextMenu {
+                                        Button(role: .destructive) { deletePhoto(photo) }
+                                            label: { Label("Delete", systemImage: "trash") }
                                     }
                                 }
+
                             }
                             .padding(.horizontal)
                         }
@@ -86,41 +98,42 @@ struct GalleryView: View {
                 Task {
                     for item in newItems {
                         if let data = try? await item.loadTransferable(type: Data.self),
-                           let img = UIImage(data: data) { savePhoto(img) }
+                           let img = UIImage(data: data) { await savePhoto(img) }
                     }
-                    selectedItems = []   // clear after saving
+                    selectedItems = []
                 }
             }
             .sheet(item: $zoomedPhoto) { photo in
-                if let img = ImageStorageService.shared.loadImage(filename: photo.filename) {
-                    ZStack {
-                        Color.wallGray.ignoresSafeArea()
-                        Image(uiImage: img)
-                            .resizable().scaledToFit()
-                            .padding(20)
-                            .chiikawaCard(color: .chiikawaWhite, radius: 28)
-                            .padding()
+                ZStack {
+                    Color.wallGray.ignoresSafeArea()
+                    AsyncImage(url: URL(string: photo.filename)) { phase in
+                        switch phase {
+                        case .success(let img):
+                            img.resizable().scaledToFit()
+                                .padding(20)
+                                .chiikawaCard(color: .chiikawaWhite, radius: 28)
+                                .padding()
+                        default:
+                            ProgressView()
+                        }
                     }
                 }
             }
         }
     }
 
-    private func savePhoto(_ image: UIImage) {
-        let filename = UUID().uuidString + ".jpg"
-        if let saved = ImageStorageService.shared.saveImage(image, name: filename) {
-            let photo = Photo(filename: saved)
-            modelContext.insert(photo)
-            Task { try? await firestore.addPhoto(photo) }  // ← Firestore sync
-        }
+    private func savePhoto(_ image: UIImage) async {
+        let name = "photos/\(UUID().uuidString).jpg"
+        guard let url = try? await StorageService.shared.uploadImage(image, householdId: firestore.householdId, name: name) else { return }
+        let photo = Photo(filename: url)   // ← store Firebase Storage URL, not local filename
+        modelContext.insert(photo)
+        try? await firestore.addPhoto(photo)
     }
-
 
     private func deletePhoto(_ photo: Photo) {
         let id = photo.id
-        ImageStorageService.shared.deleteImage(filename: photo.filename)
         modelContext.delete(photo)
-        Task { try? await firestore.deletePhoto(id: id) }  // ← Firestore sync
+        Task { try? await firestore.deletePhoto(id: id) }
     }
 }
 

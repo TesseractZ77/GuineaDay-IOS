@@ -218,18 +218,16 @@ struct PiggyCrushView: View {
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkBrown, lineWidth: 2))
 
             Button {
-                let finalScore = score  // ← capture BEFORE resetting to 0
-                if score > bestScore {
-                    bestScore = score
-                    // Save new best to Firestore
+                let finalScore = score  // ← capture BEFORE any reset
+                if finalScore > bestScore {
+                    bestScore = finalScore
                     if let uid = Auth.auth().currentUser?.uid {
-                        Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: score) }
+                        Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: finalScore) }
                     }
                 }
                 score = 0; movesLeft = totalMoves; combo = 0
                 gameOver = false; matchedPos = []; selected = nil
                 initGrid()
-                
 
             } label: {
                 Text("🌟 Play Again")

@@ -55,7 +55,7 @@ final class FirestoreService: ObservableObject {
             "birthDate": pig.birthDate,
             "breed": pig.breed,
             "gender": pig.gender,
-            "profileImageName": pig.profileImageAssetName as Any
+            "profileImageAssetName": pig.profileImageAssetName as Any  // ← fixed key name
         ], merge: true)
     }
     

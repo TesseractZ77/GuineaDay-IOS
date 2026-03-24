@@ -1,9 +1,12 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 struct DashboardView: View {
     @AppStorage("selectedMascot") private var selectedMascot: String = "kui"
+    @AppStorage("customMascotFilename") private var customMascotFilename: String = ""
         @State private var showMascotPicker = false
+    @State private var customMascotItem: PhotosPickerItem?
     @Environment(\.modelContext) private var modelContext
     @StateObject private var session = AppSession.shared
     @State private var codeCopied = false
@@ -86,11 +89,22 @@ struct DashboardView: View {
 //                                    .scaledToFit()
 //                                    .frame(width: 90, height: 90)
 //                                    .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 2, y: 3)
-                                Image(selectedMascot)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 90, height: 90)
-                                    .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 2, y: 3)
+                                // Show custom image if selected, otherwise named asset
+                                Group {
+                                    if selectedMascot == "custom",
+                                       let img = ImageStorageService.shared.loadImage(filename: customMascotFilename) {
+                                        Image(uiImage: img)
+                                            .resizable().scaledToFill()
+                                            .frame(width: 90, height: 90)
+                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    } else {
+                                        Image(selectedMascot)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 90, height: 90)
+                                    }
+                                }
+                                .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 2, y: 3)
                                     .onTapGesture { showMascotPicker = true }
                                     .overlay(alignment: .bottomTrailing) {
                                         Image(systemName: "pencil.circle.fill")
@@ -185,17 +199,17 @@ struct DashboardView: View {
                     Text("Choose Your Mascot")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(Color.inkBrown)
-                        .padding(.top,90)
+                        .padding(.top, 90)
 
-                    let pigNames = ["hachi", "kui", "nova", "elmo", "mel", "haru", "seven"]
+                    let pigNames  = ["hachi", "kui", "nova", "elmo", "mel", "haru", "seven"]
                     let pigLabels = ["Hachi", "Kui", "Nova", "Elmo", "Mel", "Haru", "Seven"]
 
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 90))], spacing: 16) {
+                        // Built-in mascots
                         ForEach(pigNames.indices, id: \.self) { i in
                             VStack(spacing: 6) {
                                 Image(pigNames[i])
-                                    .resizable()
-                                    .scaledToFit()
+                                    .resizable().scaledToFit()
                                     .frame(width: 70, height: 70)
                                     .padding(8)
                                     .background(selectedMascot == pigNames[i] ? Color.usagiYellow : Color.wallGray)
@@ -210,6 +224,44 @@ struct DashboardView: View {
                                     .font(.system(size: 11, design: .rounded))
                                     .foregroundColor(Color.inkBrown)
                             }
+                        }
+
+                        // Custom photo upload option
+                        VStack(spacing: 6) {
+                            PhotosPicker(selection: $customMascotItem, matching: .images) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(selectedMascot == "custom" ? Color.usagiYellow : Color.wallGray)
+                                        .frame(width: 70, height: 70)
+                                        .overlay(RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.inkBrown, lineWidth: selectedMascot == "custom" ? 3 : 1.5))
+                                    if selectedMascot == "custom",
+                                       let img = ImageStorageService.shared.loadImage(filename: customMascotFilename) {
+                                        Image(uiImage: img)
+                                            .resizable().scaledToFill()
+                                            .frame(width: 70, height: 70)
+                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    } else {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(.inkBrown.opacity(0.7))
+                                    }
+                                }
+                            }
+                            .onChange(of: customMascotItem) { _, newItem in
+                                Task {
+                                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                                       let img = UIImage(data: data),
+                                       let saved = ImageStorageService.shared.saveImage(img, name: "custom_mascot.jpg") {
+                                        customMascotFilename = saved
+                                        selectedMascot = "custom"
+                                        showMascotPicker = false
+                                    }
+                                }
+                            }
+                            Text("Your Own")
+                                .font(.system(size: 11, design: .rounded))
+                                .foregroundColor(Color.inkBrown)
                         }
                     }
                     .padding()

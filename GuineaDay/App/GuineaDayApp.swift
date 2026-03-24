@@ -23,7 +23,9 @@ struct GuineaDayApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(.light)  // ← force light mode app-wide
         }
         .modelContainer(sharedModelContainer)
     }
+
 }

@@ -38,8 +38,9 @@ enum AppTab: Int, CaseIterable {
 // MARK: - Main ContentView
 struct ContentView: View {
     @State private var selectedTab: AppTab = .home
-    
-
+    @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firestore: FirestoreService
+    @State private var syncManager: SyncManager?
     var body: some View {
         ZStack(alignment: .bottom) {
             // Page content
@@ -61,6 +62,16 @@ struct ContentView: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .fontDesign(.rounded)
+        .onAppear {
+            if syncManager == nil {
+                syncManager = SyncManager(modelContext: modelContext,
+                                          householdId: firestore.householdId)
+            }
+        }
+        .onDisappear {
+            syncManager?.stopListeners()
+            syncManager = nil
+        }
     }
 }
 

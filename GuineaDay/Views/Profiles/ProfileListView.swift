@@ -105,17 +105,33 @@ struct PigCard: View {
             // Blush pink header band
             ZStack {
                 Color.blushPink
-                if let name = pig.profileImageAssetName,
-                   let img = ImageStorageService.shared.loadImage(filename: name) {
-                    Image(uiImage: img)
-                        .resizable().scaledToFill()
-                        .frame(height: 110).clipped()
-                        .overlay(Color.blushPink.opacity(0.15))
+                if let urlStr = pig.profileImageAssetName {
+                    if urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
+                        // New: Firebase Storage URL
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let img):
+                                img.resizable().scaledToFill()
+                                    .frame(height: 110).clipped()
+                                    .overlay(Color.blushPink.opacity(0.15))
+                            default:
+                                Text("🐾").font(.system(size: 50))
+                            }
+                        }
+                    } else if let img = ImageStorageService.shared.loadImage(filename: urlStr) {
+                        // Old: local filename fallback
+                        Image(uiImage: img).resizable().scaledToFill()
+                            .frame(height: 110).clipped()
+                            .overlay(Color.blushPink.opacity(0.15))
+                    } else {
+                        Text("🐾").font(.system(size: 50))
+                    }
                 } else {
                     Text("🐾").font(.system(size: 50))
                 }
             }
             .frame(height: 110)
+
 
             // Name area
             VStack(spacing: 3) {
