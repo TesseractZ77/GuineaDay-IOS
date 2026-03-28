@@ -5,6 +5,7 @@
 //  Created by Carol Zhou on 19/3/2026.
 //
 
+import SwiftData
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
@@ -73,8 +74,29 @@ final class AppSession: ObservableObject {
         ])
         try await db.collection("users").document(uid).setData(["householdId": hid])
         self.householdId = hid
+        let householdDoc = try? await db.collection("households").document(hid).getDocument()
+        self.inviteCode = householdDoc?.data()?["inviteCode"] as? String
+
     }
     
+    // MARK: - Leave current household
+    func leaveHousehold(modelContext: ModelContext) async {
+        // Clear all local SwiftData
+        try? modelContext.delete(model: TaskItem.self)
+        try? modelContext.delete(model: GuineaPig.self)
+        try? modelContext.delete(model: Photo.self)
+        try? modelContext.delete(model: WeightLog.self)
+        try? modelContext.save()
+
+        // Clear session state — RootView will transition to HouseholdSetupView
+        householdId = nil
+        inviteCode  = nil
+
+        // Sign out and immediately sign in again as a new anonymous user
+        try? Auth.auth().signOut()
+        try? await signInAnonymously()
+    }
+
     // MARK: - Load existing household for user
     private func loadHousehold(for uid: String) async {
         let doc = try? await db.collection("users").document(uid).getDocument()

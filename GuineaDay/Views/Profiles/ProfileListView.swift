@@ -107,16 +107,13 @@ struct PigCard: View {
                 Color.blushPink
                 if let urlStr = pig.profileImageAssetName {
                     if urlStr.hasPrefix("http"), let url = URL(string: urlStr) {
-                        // New: Firebase Storage URL
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case .success(let img):
-                                img.resizable().scaledToFill()
-                                    .frame(height: 110).clipped()
-                                    .overlay(Color.blushPink.opacity(0.15))
-                            default:
-                                Text("🐾").font(.system(size: 50))
-                            }
+                        // New: Firebase Storage URL — cached
+                        CachedAsyncImage(url: url) { img in
+                            img.resizable().scaledToFill()
+                                .frame(height: 110).clipped()
+                                .overlay(Color.blushPink.opacity(0.15))
+                        } placeholder: {
+                            Text("🐾").font(.system(size: 50))
                         }
                     } else if let img = ImageStorageService.shared.loadImage(filename: urlStr) {
                         // Old: local filename fallback

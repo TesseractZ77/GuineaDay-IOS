@@ -23,6 +23,7 @@ private let totalMoves = 30
 // MARK: - Main View
 
 struct PiggyCrushView: View {
+    @Binding var selectedTab: AppTab
 
     @State private var grid: [[PigTile]] = []
     @State private var selected: GridPos? = nil
@@ -217,26 +218,59 @@ struct PiggyCrushView: View {
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkBrown, lineWidth: 2))
 
-            Button {
-                let finalScore = score  // ← capture BEFORE any reset
-                if finalScore > bestScore {
-                    bestScore = finalScore
-                    if let uid = Auth.auth().currentUser?.uid {
-                        Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: finalScore) }
+            // Two action buttons: Retry + Home
+            HStack(spacing: 24) {
+                // Retry
+                Button {
+                    let finalScore = score
+                    if finalScore > bestScore {
+                        bestScore = finalScore
+                        if let uid = Auth.auth().currentUser?.uid {
+                            Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: finalScore) }
+                        }
                     }
-                }
-                score = 0; movesLeft = totalMoves; combo = 0
-                gameOver = false; matchedPos = []; selected = nil
-                initGrid()
-
-            } label: {
-                Text("🌟 Play Again")
-                    .font(.system(size: 16, weight: .black, design: .rounded))
+                    score = 0; movesLeft = totalMoves; combo = 0
+                    gameOver = false; matchedPos = []; selected = nil
+                    initGrid()
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 26, weight: .black))
+                        Text("Retry")
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                    }
                     .foregroundColor(Color.inkBrown)
-                    .padding(.horizontal, 32).padding(.vertical, 14)
-                    .chiikawaCard(color: Color.mintGreen, radius: 24)
+                    .frame(width: 80, height: 70)
+                    .chiikawaCard(color: Color.mintGreen, radius: 20)
+                }
+                .buttonStyle(.plain)
+
+                // Home
+                Button {
+                    let finalScore = score
+                    if finalScore > bestScore {
+                        bestScore = finalScore
+                        if let uid = Auth.auth().currentUser?.uid {
+                            Task { try? await firestore.saveScore(playerUid: uid, game: "piggyCrush", score: finalScore) }
+                        }
+                    }
+                    score = 0; movesLeft = totalMoves; combo = 0
+                    gameOver = false; matchedPos = []; selected = nil
+                    initGrid()
+                    selectedTab = .home
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: "house.fill")
+                            .font(.system(size: 26, weight: .black))
+                        Text("Home")
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                    }
+                    .foregroundColor(Color.inkBrown)
+                    .frame(width: 80, height: 70)
+                    .chiikawaCard(color: Color.usagiYellow, radius: 20)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(32)
         .background(Color.chiikawaWhite)
@@ -385,4 +419,4 @@ struct PiggyCrushView: View {
         }
     }
 }
-#Preview { PiggyCrushView() }
+#Preview { PiggyCrushView(selectedTab: .constant(.game)) }

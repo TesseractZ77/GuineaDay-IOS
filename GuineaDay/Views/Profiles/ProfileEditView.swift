@@ -54,19 +54,17 @@ struct ProfileEditView: View {
                                         .overlay(Circle().stroke(Color.inkBrown, lineWidth: 3))
                                 } else if let urlStr = profileImageAssetName, let url = URL(string: urlStr) {
                                     // Existing photo stored as Firebase Storage URL
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .success(let img):
-                                            img.resizable().scaledToFill()
-                                                .frame(width: 120, height: 120)
-                                                .clipShape(Circle())
-                                                .overlay(Circle().stroke(Color.inkBrown, lineWidth: 3))
-                                        default:
-                                            Circle().fill(Color.usagiYellow)
-                                                .frame(width: 120, height: 120)
-                                                .overlay(ProgressView())
-                                        }
+                                    CachedAsyncImage(url: url) { img in
+                                        img.resizable().scaledToFill()
+                                            .frame(width: 120, height: 120)
+                                            .clipShape(Circle())
+                                            .overlay(Circle().stroke(Color.inkBrown, lineWidth: 3))
+                                    } placeholder: {
+                                        Circle().fill(Color.usagiYellow)
+                                            .frame(width: 120, height: 120)
+                                            .overlay(ProgressView())
                                     }
+
                                 } else {
                                     VStack {
                                         Image(systemName: "photo.badge.plus")
@@ -95,7 +93,11 @@ struct ProfileEditView: View {
                     .listRowBackground(Color.chiikawaWhite)
                     
                     Section(header: Text("Details").foregroundStyle(Color.inkBrown)) {
-                        TextField("Name", text: $name)
+                        HStack {
+                            Text("Name")
+                            TextField("Name", text: $name)
+                                .multilineTextAlignment(.trailing)
+                        }
                         DatePicker("Birthday", selection: $birthDate, displayedComponents: .date)
                         Picker("Breed", selection: $breed) {
                             ForEach(breeds, id: \.self) { Text($0) }

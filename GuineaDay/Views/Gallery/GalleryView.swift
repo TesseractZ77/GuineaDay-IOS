@@ -60,12 +60,14 @@ struct GalleryView: View {
                                 ForEach(photos) { photo in
                                     Group {
                                         if photo.filename.hasPrefix("http") {
-                                            // New photos: load from Firebase Storage URL
-                                            AsyncImage(url: URL(string: photo.filename)) { phase in
-                                                switch phase {
-                                                case .success(let img): img.resizable().scaledToFill()
-                                                default: Color.blushPink.overlay(Image(systemName: "photo").foregroundColor(.inkBrown.opacity(0.4)))
-                                                }
+                                            // New photos: load via cache
+                                            CachedAsyncImage(url: URL(string: photo.filename)) { img in
+                                                img.resizable().scaledToFill()
+                                            } placeholder: {
+                                                Color.blushPink.overlay(
+                                                    Image(systemName: "photo")
+                                                        .foregroundColor(.inkBrown.opacity(0.4))
+                                                )
                                             }
                                         } else if let img = ImageStorageService.shared.loadImage(filename: photo.filename) {
                                             // Old photos: load from local storage (physical phone only)
@@ -106,16 +108,13 @@ struct GalleryView: View {
             .sheet(item: $zoomedPhoto) { photo in
                 ZStack {
                     Color.wallGray.ignoresSafeArea()
-                    AsyncImage(url: URL(string: photo.filename)) { phase in
-                        switch phase {
-                        case .success(let img):
-                            img.resizable().scaledToFit()
-                                .padding(20)
-                                .chiikawaCard(color: .chiikawaWhite, radius: 28)
-                                .padding()
-                        default:
-                            ProgressView()
-                        }
+                    CachedAsyncImage(url: URL(string: photo.filename)) { img in
+                        img.resizable().scaledToFit()
+                            .padding(20)
+                            .chiikawaCard(color: .chiikawaWhite, radius: 28)
+                            .padding()
+                    } placeholder: {
+                        ProgressView()
                     }
                 }
             }

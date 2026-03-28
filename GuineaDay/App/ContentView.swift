@@ -44,16 +44,29 @@ struct ContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             // Page content
-            Group {
-                switch selectedTab {
-                case .home:    DashboardView()
-                case .duties:  TaskListView()
-                case .gallery: GalleryView()
-                case .piggies: ProfileListView()
-                case .game:    PiggyCrushView()
-                }
+            ZStack {
+                DashboardView(selectedTab: $selectedTab)
+                    .opacity(selectedTab == .home ? 1 : 0)
+                    .allowsHitTesting(selectedTab == .home)
+
+                TaskListView()
+                    .opacity(selectedTab == .duties ? 1 : 0)
+                    .allowsHitTesting(selectedTab == .duties)
+
+                GalleryView()
+                    .opacity(selectedTab == .gallery ? 1 : 0)
+                    .allowsHitTesting(selectedTab == .gallery)
+
+                ProfileListView()
+                    .opacity(selectedTab == .piggies ? 1 : 0)
+                    .allowsHitTesting(selectedTab == .piggies)
+
+                PiggyCrushView(selectedTab: $selectedTab)
+                    .opacity(selectedTab == .game ? 1 : 0)
+                    .allowsHitTesting(selectedTab == .game)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+
 
             // Floating Chiikawa Tab Bar
             ChiikawaTabBar(selected: $selectedTab)

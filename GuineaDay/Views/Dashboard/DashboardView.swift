@@ -3,10 +3,13 @@ import SwiftData
 import PhotosUI
 
 struct DashboardView: View {
+    @Binding var selectedTab: AppTab
     @AppStorage("selectedMascot") private var selectedMascot: String = "kui"
     @AppStorage("customMascotFilename") private var customMascotFilename: String = ""
         @State private var showMascotPicker = false
     @State private var customMascotItem: PhotosPickerItem?
+    @State private var showLeaveAlert = false
+    @State private var isLeaving = false
     @Environment(\.modelContext) private var modelContext
     @StateObject private var session = AppSession.shared
     @State private var codeCopied = false
@@ -51,14 +54,20 @@ struct DashboardView: View {
                         // ── Top banner: date + weather ──
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-//                                Text("Today")
-//                                    .font(.caption)
-//                                    .foregroundStyle(Color.inkBrown.opacity(0.6))
                                 Text(Date().formatted(.dateTime.weekday(.wide).month().day()))
                                     .font(.system(size: 18, weight: .bold, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
                             }
                             Spacer()
+                            // Leave household button
+                            Button {
+                                showLeaveAlert = true
+                            } label: {
+                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(Color.inkBrown.opacity(0.6))
+                                    .padding(8)
+                            }
                             if let weather = weatherService.currentWeatherData {
                                 HStack(spacing: 6) {
                                     Text(weather.condition).font(.title3)
@@ -135,9 +144,15 @@ struct DashboardView: View {
 
                         // ── Stats row ──
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                            DashStatCard(icon: "pawprint.fill",  value: "\(pigs.count)",    label: "Piggies",  color: .blushPink)
-                            DashStatCard(icon: "checkmark.circle.fill", value: "\(pendingCount)", label: "To-Do", color: .usagiYellow)
-                            DashStatCard(icon: "photo.stack.fill", value: "\(photos.count)", label: "Memories", color: .lavenderPurple)
+                            Button { selectedTab = .piggies } label: {
+                                DashStatCard(icon: "pawprint.fill",  value: "\(pigs.count)",    label: "Piggies",  color: .blushPink)
+                            }.buttonStyle(.plain)
+                            Button { selectedTab = .duties } label: {
+                                DashStatCard(icon: "checkmark.circle.fill", value: "\(pendingCount)", label: "To-Do", color: .usagiYellow)
+                            }.buttonStyle(.plain)
+                            Button { selectedTab = .gallery } label: {
+                                DashStatCard(icon: "photo.stack.fill", value: "\(photos.count)", label: "Memories", color: .lavenderPurple)
+                            }.buttonStyle(.plain)
                         }
                         .padding(.horizontal)
 
@@ -271,6 +286,14 @@ struct DashboardView: View {
             }
 
             .navigationBarHidden(true)
+            .alert("Leave Household?", isPresented: $showLeaveAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Leave", role: .destructive) {
+                    Task { await session.leaveHousehold(modelContext: modelContext) }
+                }
+            } message: {
+                Text("Your local data will be cleared. You can join or create a new household.")
+            }
         }
     }
 }
@@ -328,4 +351,4 @@ struct StatCard: View {
     }
 }
 
-#Preview { DashboardView() }
+#Preview { DashboardView(selectedTab: .constant(.home)) }
