@@ -96,6 +96,7 @@ struct GalleryView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task { await prefetchPhotos() }
             .onChange(of: selectedItems) { _, newItems in
                 Task {
                     for item in newItems {
@@ -108,14 +109,25 @@ struct GalleryView: View {
             .sheet(item: $zoomedPhoto) { photo in
                 ZStack {
                     Color.wallGray.ignoresSafeArea()
-                    CachedAsyncImage(url: URL(string: photo.filename)) { img in
-                        img.resizable().scaledToFit()
+                    // Try reading directly from cache first (instant, no async needed)
+                    if let cachedImg = ImageCacheService.shared.image(for: photo.filename) {
+                        Image(uiImage: cachedImg)
+                            .resizable().scaledToFit()
                             .padding(20)
                             .chiikawaCard(color: .chiikawaWhite, radius: 28)
                             .padding()
-                    } placeholder: {
-                        ProgressView()
+                    } else {
+                        // Fallback: download if cache was evicted
+                        CachedAsyncImage(url: URL(string: photo.filename)) { img in
+                            img.resizable().scaledToFit()
+                                .padding(20)
+                                .chiikawaCard(color: .chiikawaWhite, radius: 28)
+                                .padding()
+                        } placeholder: {
+                            ProgressView()
+                        }
                     }
+
                 }
             }
         }
@@ -134,6 +146,22 @@ struct GalleryView: View {
         modelContext.delete(photo)
         Task { try? await firestore.deletePhoto(id: id) }
     }
+    private func prefetchPhotos() async {
+        await withTaskGroup(of: Void.self) { group in
+            for photo in photos where photo.filename.hasPrefix("http") {
+                let urlStr = photo.filename
+                guard ImageCacheService.shared.image(for: urlStr) == nil,
+                      let url = URL(string: urlStr) else { continue }
+                group.addTask {
+                    if let (data, _) = try? await URLSession.shared.data(from: url),
+                       let img = UIImage(data: data) {
+                        ImageCacheService.shared.store(img, for: urlStr)
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 extension Photo: Identifiable {}
