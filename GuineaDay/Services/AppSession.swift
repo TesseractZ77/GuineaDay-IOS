@@ -81,6 +81,13 @@ final class AppSession: ObservableObject {
     
     // MARK: - Leave current household
     func leaveHousehold(modelContext: ModelContext) async {
+        
+        // remove current UID from household members BEFORE signing out
+        if let uid = Auth.auth().currentUser?.uid, let hid = householdId {
+            try? await db.collection("households").document(hid).updateData([
+                "members": FieldValue.arrayRemove([uid])
+            ])
+        }
         // Clear all local SwiftData
         try? modelContext.delete(model: TaskItem.self)
         try? modelContext.delete(model: GuineaPig.self)
