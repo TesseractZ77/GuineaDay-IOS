@@ -78,6 +78,16 @@ struct ProfileListView: View {
                                 }
                             }
                             .padding(.horizontal)
+
+                            // Subtle hint — only shown when piggies exist
+                            HStack(spacing: 4) {
+                                Image(systemName: "hand.tap")
+                                    .font(.system(size: 10))
+                                Text("Long press a card to delete")
+                                    .font(.system(size: 10, design: .rounded))
+                            }
+                            .foregroundStyle(Color.inkBrown.opacity(0.3))
+                            .padding(.top, -4)
                         }
 
                         Spacer().frame(height: 90)
@@ -188,19 +198,6 @@ struct PigCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22))
         .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.inkBrown, lineWidth: 3))
         .shadow(color: Color.inkBrown.opacity(0.45), radius: 0, x: 3, y: 4)
-        // Trash button at bottom-right of full card
-        .overlay(alignment: .bottomTrailing) {
-            Button(action: onDelete) {
-                Image(systemName: "trash.fill")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.inkBrown)
-                    .padding(7)
-                    .background(Circle().fill(Color.chiikawaWhite))
-                    .overlay(Circle().stroke(Color.inkBrown, lineWidth: 1.5))
-                    .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 1, y: 2)
-            }
-            .padding(8)
-        }
     }
 }
 
