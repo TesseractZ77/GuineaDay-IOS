@@ -6,10 +6,9 @@ struct DashboardView: View {
     @Binding var selectedTab: AppTab
     @AppStorage("selectedMascot") private var selectedMascot: String = "kui"
     @AppStorage("customMascotFilename") private var customMascotFilename: String = ""
-        @State private var showMascotPicker = false
+    @State private var showMascotPicker = false
     @State private var customMascotItem: PhotosPickerItem?
-    @State private var showLeaveAlert = false
-    @State private var isLeaving = false
+    @State private var showSettings     = false   // Settings sheet
     @Environment(\.modelContext) private var modelContext
     @StateObject private var session = AppSession.shared
     @State private var codeCopied = false
@@ -59,11 +58,9 @@ struct DashboardView: View {
                                     .foregroundStyle(Color.inkBrown)
                             }
                             Spacer()
-                            // Leave household button
-                            Button {
-                                showLeaveAlert = true
-                            } label: {
-                                Image(systemName: "rectangle.portrait.and.arrow.right")
+                            // Settings gear button
+                            Button { showSettings = true } label: {
+                                Image(systemName: "gearshape.fill")
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundColor(Color.inkBrown.opacity(0.6))
                                     .padding(8)
@@ -286,13 +283,8 @@ struct DashboardView: View {
             }
 
             .navigationBarHidden(true)
-            .alert("Leave Household?", isPresented: $showLeaveAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Leave", role: .destructive) {
-                    Task { await session.leaveHousehold(modelContext: modelContext) }
-                }
-            } message: {
-                Text("Your local data will be cleared. You can join or create a new household.")
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
         }
     }

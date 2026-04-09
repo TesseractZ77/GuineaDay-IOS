@@ -1,12 +1,26 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - Sheet destination
+private enum SheetDestination: Identifiable {
+    case addNew
+    case edit(GuineaPig)
+
+    var id: String {
+        switch self {
+        case .addNew:       return "add"
+        case .edit(let p):  return p.id.uuidString
+        }
+    }
+}
+
 struct ProfileListView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firestore: FirestoreService
     @Query(sort: \GuineaPig.name) private var guineaPigs: [GuineaPig]
 
-    @State private var showingAddPig = false
-    @State private var selectedPig: GuineaPig?
+    @State private var sheetDestination: SheetDestination?  // single sheet state
+    @State private var pigToDelete: GuineaPig?              // delete confirmation
 
     let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
@@ -17,7 +31,7 @@ struct ProfileListView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Header banner
+                        // Header banner (title only — + button is a ZStack overlay below)
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("My Piggies 🐾")
@@ -28,15 +42,6 @@ struct ProfileListView: View {
                                     .foregroundStyle(Color.inkBrown.opacity(0.6))
                             }
                             Spacer()
-                            // Add button
-                            Button(action: { showingAddPig = true }) {
-                                ZStack {
-                                    Circle().fill(Color.blushPink).frame(width: 44, height: 44)
-                                        .overlay(Circle().stroke(Color.inkBrown, lineWidth: 2.5))
-                                        .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 2, y: 3)
-                                    Image(systemName: "plus").font(.system(size: 18, weight: .black)).foregroundColor(.inkBrown)
-                                }
-                            }
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -58,12 +63,18 @@ struct ProfileListView: View {
                         } else {
                             LazyVGrid(columns: columns, spacing: 16) {
                                 ForEach(guineaPigs) { pig in
-                                    PigCard(pig: pig)
-                                        .onTapGesture { selectedPig = pig }
-                                        .contextMenu {
-                                            Button(role: .destructive) { deletePig(pig) }
-                                                label: { Label("Delete", systemImage: "trash") }
-                                        }
+                                    // Use Button (not onTapGesture) for precise hit-testing
+                                    Button { sheetDestination = .edit(pig) } label: {
+                                        PigCard(
+                                            pig: pig,
+                                            onDelete: { pigToDelete = pig }
+                                        )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .contextMenu {
+                                        Button(role: .destructive) { pigToDelete = pig }
+                                            label: { Label("Delete", systemImage: "trash") }
+                                    }
                                 }
                             }
                             .padding(.horizontal)
@@ -73,15 +84,42 @@ struct ProfileListView: View {
                     }
                 }
             }
+            // + button is OUTSIDE the ScrollView — no gesture conflict with card grid
+            .overlay(alignment: .topTrailing) {
+                ChiikawaAddButton(color: .blushPink) { sheetDestination = .addNew }
+                    .padding(.top, 16)
+                    .padding(.trailing, 16)
+            }
             .navigationBarHidden(true)
-            .sheet(isPresented: $showingAddPig) { ProfileEditView() }
-            .sheet(item: $selectedPig) { pig in ProfileEditView(guineaPig: pig) }
+            // Single sheet handles both "Add New" and "Edit Existing"
+            .sheet(item: $sheetDestination) { destination in
+                switch destination {
+                case .addNew:       ProfileEditView()
+                case .edit(let p): ProfileEditView(guineaPig: p)
+                }
+            }
+            // Bug 3: delete confirmation alert
+            .alert("Delete \(pigToDelete?.name ?? "Piggy")?", isPresented: Binding(
+                get:  { pigToDelete != nil },
+                set:  { if !$0 { pigToDelete = nil } }
+            )) {
+                Button("Delete", role: .destructive) {
+                    if let pig = pigToDelete { deletePig(pig) }
+                    pigToDelete = nil
+                }
+                Button("Cancel", role: .cancel) { pigToDelete = nil }
+            } message: {
+                Text("This will permanently remove \(pigToDelete?.name ?? "this piggy") for everyone in your household.")
+            }
         }
     }
 
+    // Bug 3: Delete locally AND from Firestore (permanent for all household members)
     private func deletePig(_ pig: GuineaPig) {
+        let pigId = pig.id
         if let img = pig.profileImageAssetName { ImageStorageService.shared.deleteImage(filename: img) }
         modelContext.delete(pig)
+        Task { try? await firestore.deletePig(id: pigId) }
     }
 }
 
@@ -99,6 +137,7 @@ struct PigCard: View {
     }
 
     let pig: GuineaPig
+    var onDelete: () -> Void = {}
 
     var body: some View {
         VStack(spacing: 0) {
@@ -129,7 +168,6 @@ struct PigCard: View {
             }
             .frame(height: 110)
 
-
             // Name area
             VStack(spacing: 3) {
                 Text(pig.name)
@@ -150,6 +188,19 @@ struct PigCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 22))
         .overlay(RoundedRectangle(cornerRadius: 22).stroke(Color.inkBrown, lineWidth: 3))
         .shadow(color: Color.inkBrown.opacity(0.45), radius: 0, x: 3, y: 4)
+        // Trash button at bottom-right of full card
+        .overlay(alignment: .bottomTrailing) {
+            Button(action: onDelete) {
+                Image(systemName: "trash.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.inkBrown)
+                    .padding(7)
+                    .background(Circle().fill(Color.chiikawaWhite))
+                    .overlay(Circle().stroke(Color.inkBrown, lineWidth: 1.5))
+                    .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 1, y: 2)
+            }
+            .padding(8)
+        }
     }
 }
 

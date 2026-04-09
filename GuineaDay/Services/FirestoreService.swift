@@ -26,13 +26,17 @@ final class FirestoreService: ObservableObject {
     // MARK: - Tasks
     func addTask(_ task: TaskItem) async throws {
         try await houseRef().collection("tasks").document(task.id.uuidString).setData([
-            "id": task.id.uuidString,
-            "title": task.title,
-            "dueDate": task.dueDate,
-            "isCompleted": task.isCompleted,
-            "category": task.category,
-            "priority": task.priority,
-            "createdAt": task.createdAt
+            "id":              task.id.uuidString,
+            "title":           task.title,
+            "dueDate":         task.dueDate,
+            "isCompleted":     task.isCompleted,
+            "category":        task.category,
+            "priority":        task.priority,
+            "createdAt":       task.createdAt,
+            "isRecurring":     task.isRecurring,
+            "recurrenceRule":  task.recurrenceRule,
+            "reminderEnabled": task.reminderEnabled,
+            "reminderTime":    task.reminderTime as Any
         ])
     }
     

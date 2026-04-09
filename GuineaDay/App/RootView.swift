@@ -12,7 +12,12 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if !session.isSignedIn {
+            if session.startupFailed {
+                // Bug 1: Firebase unreachable (e.g. blocked in mainland China)
+                NetworkErrorView {
+                    session.retrySignIn()
+                }
+            } else if !session.isSignedIn {
                 // Silent auto sign-in — shows briefly while Firebase authenticates
                 Color.wallGray.ignoresSafeArea()
                     .onAppear {
@@ -27,6 +32,7 @@ struct RootView: View {
                     .environmentObject(FirestoreService(householdId: session.householdId!))
             }
         }
+        .animation(.easeInOut, value: session.startupFailed)
         .animation(.easeInOut, value: session.isSignedIn)
         .animation(.easeInOut, value: session.householdId)
         .animation(.easeInOut, value: session.showingInviteCode)

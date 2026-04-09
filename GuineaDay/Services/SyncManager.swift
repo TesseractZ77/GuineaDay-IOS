@@ -130,16 +130,33 @@ final class SyncManager: ObservableObject {
             let priority = data["priority"] as? String
         else { return }
 
+        let isRecurring     = data["isRecurring"]     as? Bool   ?? false
+        let recurrenceRule  = data["recurrenceRule"]  as? String ?? "none"
+        let reminderEnabled = data["reminderEnabled"] as? Bool   ?? false
+        let reminderTime    = (data["reminderTime"]   as? Timestamp)?.dateValue()
+
         let predicate = #Predicate<TaskItem> { $0.id == id }
         let existing  = try? modelContext.fetch(FetchDescriptor(predicate: predicate)).first
 
         if let task = existing {
-            task.title       = title
-            task.isCompleted = data["isCompleted"] as? Bool ?? false
+            task.title           = title
+            task.isCompleted     = data["isCompleted"] as? Bool ?? false
+            task.isRecurring     = isRecurring
+            task.recurrenceRule  = recurrenceRule
+            task.reminderEnabled = reminderEnabled
+            task.reminderTime    = reminderTime
         } else {
             let task = TaskItem(title: title, dueDate: dueDate, category: category, priority: priority)
-            task.id = id   // ← set Firestore id so future syncs match correctly
+            task.id              = id
+            task.isRecurring     = isRecurring
+            task.recurrenceRule  = recurrenceRule
+            task.reminderEnabled = reminderEnabled
+            task.reminderTime    = reminderTime
             modelContext.insert(task)
+            // Schedule notification on THIS device for tasks received from another device
+            if reminderEnabled {
+                NotificationService.shared.schedule(for: task)
+            }
         }
         try? modelContext.save()
     }

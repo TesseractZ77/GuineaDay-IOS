@@ -3,7 +3,7 @@ import SwiftData
 
 @Model
 final class TaskItem {
-    var id: UUID          // ← NEW: stable ID for Firestore
+    var id: UUID
     var title: String
     var dueDate: Date
     var isCompleted: Bool
@@ -11,15 +11,21 @@ final class TaskItem {
     var priority: String
     var createdAt: Date
     var completedAt: Date?
+    // Recurring
+    var isRecurring:    Bool    = false
+    var recurrenceRule: String  = "none"    // "none" | "daily" | "weekly" | "monthly"
+    // Reminders
+    var reminderEnabled: Bool   = false
+    var reminderTime:    Date?  = nil       // exact date+time for UNNotification
 
     init(title: String, dueDate: Date, category: String, priority: String) {
-        self.id = UUID()  // ← NEW
-        self.title = title
-        self.dueDate = dueDate
+        self.id          = UUID()
+        self.title       = title
+        self.dueDate     = dueDate
         self.isCompleted = false
-        self.category = category
-        self.priority = priority
-        self.createdAt = Date()
+        self.category    = category
+        self.priority    = priority
+        self.createdAt   = Date()
     }
 }
 

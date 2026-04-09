@@ -33,6 +33,18 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                     .task { await load() }
             }
         }
+        // When the URL changes (e.g. profile photo updated), @State is NOT reset
+        // automatically by SwiftUI — we must do it manually.
+        .onChange(of: url) { _, newURL in
+            uiImage    = nil
+            isLoading  = false
+            guard let newURL else { return }
+            // Synchronous cache hit: saveProfile() already stored the image here
+            if let cached = ImageCacheService.shared.image(for: newURL.absoluteString) {
+                uiImage = cached
+            }
+            // Cache miss → placeholder's .task will call load() and download it
+        }
     }
 
     private func load() async {

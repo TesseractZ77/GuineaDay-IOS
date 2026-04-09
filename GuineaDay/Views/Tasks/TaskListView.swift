@@ -51,14 +51,7 @@ struct TaskListView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button(action: { showingAddTask = true }) {
-                        ZStack {
-                            Circle().fill(Color.usagiYellow).frame(width: 34, height: 34)
-                                .overlay(Circle().stroke(Color.inkBrown, lineWidth: 2))
-                                .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 1, y: 2)
-                            Image(systemName: "plus").fontWeight(.black).foregroundColor(.inkBrown)
-                        }
-                    }
+                    ChiikawaAddButton(color: .usagiYellow) { showingAddTask = true }
                 }
             }
             .sheet(isPresented: $showingAddTask) { AddTaskView() }
@@ -66,9 +59,10 @@ struct TaskListView: View {
     }
 
     private func deleteTask(_ task: TaskItem) {
+        NotificationService.shared.cancel(for: task)   // cancel reminder before deleting
         let id = task.id
         withAnimation { modelContext.delete(task) }
-        Task { try? await firestore.deleteTask(id: id) }  // ← Firestore sync
+        Task { try? await firestore.deleteTask(id: id) }
     }
 
     @ViewBuilder
@@ -88,6 +82,8 @@ struct TaskRow: View {
     @EnvironmentObject var firestore: FirestoreService
     let onDelete: () -> Void
 
+    @State private var recurringFlash = false
+
     var stripeColor: Color {
         task.isCompleted ? .mintGreen :
         (task.priority.lowercased() == "high" ? .blushPink :
@@ -106,15 +102,35 @@ struct TaskRow: View {
             HStack(spacing: 12) {
                 // Completion toggle
                 Button(action: {
-                    withAnimation(.spring()) {
-                        task.isCompleted.toggle()
-                        task.completedAt = task.isCompleted ? Date() : nil
+                    if task.isRecurring {
+                        // ── Recurring: local flash only, task stays in To-Do ──
+                        // Never sets isCompleted — task never moves to Done section
+                        withAnimation(.spring(dampingFraction: 0.5)) { recurringFlash = true }
+                        NotificationService.shared.cancel(for: task)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                            withAnimation(.easeInOut(duration: 0.4)) {
+                                recurringFlash = false
+                                resetForNextOccurrence()  // bumps dueDate in-place
+                            }
+                        }
+                    } else {
+                        // ── Normal: plain toggle ──
+                        let completing = !task.isCompleted
+                        if completing { NotificationService.shared.cancel(for: task) }
+                        withAnimation(.spring()) {
+                            task.isCompleted.toggle()
+                            task.completedAt = task.isCompleted ? Date() : nil
+                        }
+                        Task { try? await firestore.updateTask(task) }
                     }
-                    Task { try? await firestore.updateTask(task) }  // ← Firestore sync
                 }) {
-                    Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                    Image(systemName: (recurringFlash || task.isCompleted) ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(task.isCompleted ? Color.mintGreen : Color.inkBrown.opacity(0.4))
+                        .foregroundStyle(
+                            recurringFlash ? Color.mintGreen :
+                            task.isCompleted ? Color.mintGreen : Color.inkBrown.opacity(0.4)
+                        )
+                        .scaleEffect(recurringFlash ? 1.2 : 1.0)
                 }
                 .buttonStyle(.plain)
 
@@ -127,6 +143,17 @@ struct TaskRow: View {
                         Text(task.dueDate, style: .date)
                         Text("·")
                         Text(task.category.capitalized)
+                        if task.isRecurring {
+                            Text("·")
+                            Image(systemName: "arrow.trianglehead.2.clockwise")
+                                .font(.system(size: 9))
+                            Text(task.recurrenceRule.capitalized)
+                        }
+                        if task.reminderEnabled {
+                            Text("·")
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 9))
+                        }
                     }
                     .font(.system(size: 11, design: .rounded))
                     .foregroundStyle(Color.inkBrown.opacity(0.5))
@@ -155,6 +182,37 @@ struct TaskRow: View {
                 Label("Delete", systemImage: "trash")
             }
         }
+    }
+
+    // MARK: - Reset recurring task in-place (no copy spawned)
+    private func resetForNextOccurrence() {
+        let cal = Calendar.current
+        let nextDue: Date
+        switch task.recurrenceRule {
+        case "daily":   nextDue = cal.date(byAdding: .day,   value: 1, to: task.dueDate) ?? task.dueDate
+        case "weekly":  nextDue = cal.date(byAdding: .day,   value: 7, to: task.dueDate) ?? task.dueDate
+        case "monthly": nextDue = cal.date(byAdding: .month, value: 1, to: task.dueDate) ?? task.dueDate
+        default: return
+        }
+        // Reset the same task object — no new copy, no accumulation in Done list
+        task.isCompleted = false
+        task.completedAt = nil
+        task.dueDate     = nextDue
+
+        // Bump the reminder to the next occurrence's time
+        if task.reminderEnabled, let oldReminder = task.reminderTime {
+            let nextReminder: Date
+            switch task.recurrenceRule {
+            case "daily":   nextReminder = cal.date(byAdding: .day,   value: 1, to: oldReminder) ?? oldReminder
+            case "weekly":  nextReminder = cal.date(byAdding: .day,   value: 7, to: oldReminder) ?? oldReminder
+            case "monthly": nextReminder = cal.date(byAdding: .month, value: 1, to: oldReminder) ?? oldReminder
+            default:        nextReminder = oldReminder
+            }
+            task.reminderTime = nextReminder
+            NotificationService.shared.schedule(for: task)  // same UUID → clean reschedule
+        }
+        // Push the full reset state to Firestore (overwrites the doc in-place)
+        Task { try? await firestore.addTask(task) }
     }
 }
 

@@ -19,8 +19,11 @@ struct ProfileEditView: View {
     @State private var selectedItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     @State private var profileImageAssetName: String?
+
+    // Bug 3: Prevent duplicate saves from multiple rapid taps
+    @State private var isSaving = false
     
-    let breeds = ["American", "Abyssinian", "Peruvian", "Silkie", "Skinny", "Rex", "Texel"]
+    let breeds = ["American", "Abyssinian", "Alpaca", "Baldwin", "Peruvian", "Silkie", "Skinny", "Rex", "Texel", "Coronet", "Himalayan", "Sheltie", "Sheba"]
     let genders = ["Boar", "Sow"]
     
     init(guineaPig: GuineaPig? = nil) {
@@ -126,32 +129,46 @@ struct ProfileEditView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
                         .foregroundStyle(Color.inkBrown)
+                        .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { saveProfile() }
-                        .foregroundStyle(Color.inkBrown)
-                        .disabled(name.isEmpty)
+                    if isSaving {
+                        ProgressView()
+                            .tint(Color.inkBrown)
+                    } else {
+                        Button("Save") { saveProfile() }
+                            .foregroundStyle(Color.inkBrown)
+                            .disabled(name.isEmpty)
+                    }
                 }
             }
         }
     }
     
     private func saveProfile() {
+        // Bug 3: Guard against multiple concurrent taps
+        guard !isSaving else { return }
+        isSaving = true
+
         Task {
+            defer { isSaving = false }
+
             // If a new image was picked, upload to Firebase Storage first
             if let newImage = selectedImage {
                 let path = "profiles/\(UUID().uuidString).jpg"
                 if let url = try? await StorageService.shared.uploadImage(
                     newImage, householdId: firestore.householdId, name: path) {
-                    profileImageAssetName = url  // ← store Firebase Storage URL
+                    // Bug 2: Pre-populate cache so the card refreshes instantly
+                    ImageCacheService.shared.store(newImage, for: url)
+                    profileImageAssetName = url
                 }
             }
 
             if let guineaPig {
-                guineaPig.name = name
+                guineaPig.name      = name
                 guineaPig.birthDate = birthDate
-                guineaPig.breed = breed
-                guineaPig.gender = gender
+                guineaPig.breed     = breed
+                guineaPig.gender    = gender
                 guineaPig.profileImageAssetName = profileImageAssetName
                 try? await firestore.savePig(guineaPig)
             } else {

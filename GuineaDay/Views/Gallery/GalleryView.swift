@@ -19,7 +19,7 @@ struct GalleryView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Header
+                        // Header (title only — + button is a ZStack overlay below)
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Memories 🌸")
@@ -30,14 +30,6 @@ struct GalleryView: View {
                                     .foregroundStyle(Color.inkBrown.opacity(0.6))
                             }
                             Spacer()
-                            PhotosPicker(selection: $selectedItems, maxSelectionCount: 10, matching: .images) {
-                                ZStack {
-                                    Circle().fill(Color.lavenderPurple).frame(width: 44, height: 44)
-                                        .overlay(Circle().stroke(Color.inkBrown, lineWidth: 2.5))
-                                        .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 2, y: 3)
-                                    Image(systemName: "plus").font(.system(size: 18, weight: .black)).foregroundColor(.inkBrown)
-                                }
-                            }
                         }
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -94,6 +86,12 @@ struct GalleryView: View {
                         Spacer().frame(height: 90)
                     }
                 }
+            }
+            // + button OUTSIDE ScrollView — no gesture conflict with photo grid
+            .overlay(alignment: .topTrailing) {
+                ChiikawaPhotoPickerButton(color: .lavenderPurple, selectedItems: $selectedItems)
+                    .padding(.top, 16)
+                    .padding(.trailing, 16)
             }
             .navigationBarHidden(true)
             .task { await prefetchPhotos() }
