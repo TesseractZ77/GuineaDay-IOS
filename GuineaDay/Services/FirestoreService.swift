@@ -25,6 +25,7 @@ final class FirestoreService: ObservableObject {
     
     // MARK: - Tasks
     func addTask(_ task: TaskItem) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("tasks").document(task.id.uuidString).setData([
             "id":              task.id.uuidString,
             "title":           task.title,
@@ -41,6 +42,7 @@ final class FirestoreService: ObservableObject {
     }
     
     func updateTask(_ task: TaskItem) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("tasks").document(task.id.uuidString).updateData([
             "isCompleted": task.isCompleted,
             "completedAt": task.completedAt as Any
@@ -48,27 +50,31 @@ final class FirestoreService: ObservableObject {
     }
     
     func deleteTask(id: UUID) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("tasks").document(id.uuidString).delete()
     }
     
     // MARK: - Guinea Pigs
     func savePig(_ pig: GuineaPig) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("pigs").document(pig.id.uuidString).setData([
             "id": pig.id.uuidString,
             "name": pig.name,
             "birthDate": pig.birthDate,
             "breed": pig.breed,
             "gender": pig.gender,
-            "profileImageAssetName": pig.profileImageAssetName as Any  // ← fixed key name
+            "profileImageAssetName": pig.profileImageAssetName as Any
         ], merge: true)
     }
     
     func deletePig(id: UUID) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("pigs").document(id.uuidString).delete()
     }
     
     // MARK: - Weight Logs
     func addWeightLog(_ log: WeightLog, pigId: UUID) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("pigs").document(pigId.uuidString)
             .collection("weights").document(log.id.uuidString).setData([
                 "id": log.id.uuidString,
@@ -78,12 +84,14 @@ final class FirestoreService: ObservableObject {
     }
     
     func deleteWeightLog(id: UUID, pigId: UUID) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("pigs").document(pigId.uuidString)
             .collection("weights").document(id.uuidString).delete()
     }
     
     // MARK: - Photos
     func addPhoto(_ photo: Photo) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("photos").document(photo.id.uuidString).setData([
             "id": photo.id.uuidString,
             "filename": photo.filename,
@@ -92,11 +100,13 @@ final class FirestoreService: ObservableObject {
     }
     
     func deletePhoto(id: UUID) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("photos").document(id.uuidString).delete()
     }
     
     // MARK: - Game Scores
     func saveScore(playerUid: String, game: String, score: Int) async throws {
+        guard AppMode.current == .cloud else { return }
         try await houseRef().collection("scores").document(playerUid).setData([
             "uid": playerUid,
             "game": game,
@@ -106,7 +116,12 @@ final class FirestoreService: ObservableObject {
     }
 
     func listenToScores(onChange: @escaping ([String: Int]) -> Void) -> ListenerRegistration {
-        houseRef().collection("scores").addSnapshotListener { snap, _ in
+        // In local mode, return an immediately-cancelled no-op listener
+        guard AppMode.current == .cloud else {
+            return houseRef().collection("scores")
+                .addSnapshotListener { _, _ in }  // attach + immediately return; no data flows
+        }
+        return houseRef().collection("scores").addSnapshotListener { snap, _ in
             guard let snap else { return }
             var scores: [String: Int] = [:]
             for doc in snap.documents {

@@ -30,6 +30,7 @@ final class SyncManager: ObservableObject {
     // MARK: - Start All Listeners
 
     func startListeners() {
+        guard AppMode.current == .cloud else { return }  // local mode: no Firebase
 
         // Tasks listener
         let taskListener = houseRef().collection("tasks").addSnapshotListener { [weak self] snap, error in

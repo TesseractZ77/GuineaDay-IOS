@@ -9,29 +9,45 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var session = AppSession.shared
+    // @AppStorage mirrors UserDefaults — any write auto-triggers re-render here
+    @AppStorage("hasShownRegionSelector") private var hasShownRegionSelector = false
+    @AppStorage("appMode")               private var appModeRaw              = ""
 
     var body: some View {
         Group {
-            if session.startupFailed {
-                // Bug 1: Firebase unreachable (e.g. blocked in mainland China)
-                NetworkErrorView {
-                    session.retrySignIn()
-                }
-            } else if !session.isSignedIn {
-                // Silent auto sign-in — shows briefly while Firebase authenticates
-                Color.wallGray.ignoresSafeArea()
-                    .onAppear {
-                        Task { try? await session.signInAnonymously() }
-                    }
-            } else if session.householdId == nil {
-                HouseholdSetupView()
-            } else if session.showingInviteCode, let code = session.inviteCode {
-                inviteCodeScreen(code: code)
-            } else {
+            // ── 1. First launch: pick region ─────────────────────────────────
+            if !hasShownRegionSelector {
+                RegionSelectionView(onSelected: {})   // AppMode.set() writes the key → auto re-renders
+
+            // ── 2. China Mainland: skip Firebase entirely ─────────────────────
+            } else if AppMode.current == .local {
                 ContentView()
-                    .environmentObject(FirestoreService(householdId: session.householdId!))
+                    .environmentObject(FirestoreService(householdId: "local"))  // all methods are no-ops
+
+            // ── 3. International: full cloud flow ─────────────────────────────
+            } else {
+                ZStack {
+                    if session.startupFailed {
+                        NetworkErrorView { session.retrySignIn() }
+                    } else if !session.isSignedIn {
+                        Color.wallGray.ignoresSafeArea()
+                            .onAppear { Task { try? await session.signInAnonymously() } }
+                    } else if session.householdId == nil {
+                        HouseholdSetupView()
+                    } else if session.showingInviteCode, let code = session.inviteCode {
+                        inviteCodeScreen(code: code)
+                    } else {
+                        ContentView()
+                            .environmentObject(FirestoreService(householdId: session.householdId!))
+                    }
+                }
+                .onAppear {
+                    session.setupCloudServices()
+                }
             }
         }
+        .animation(.easeInOut, value: hasShownRegionSelector)
+        .animation(.easeInOut, value: appModeRaw)
         .animation(.easeInOut, value: session.startupFailed)
         .animation(.easeInOut, value: session.isSignedIn)
         .animation(.easeInOut, value: session.householdId)

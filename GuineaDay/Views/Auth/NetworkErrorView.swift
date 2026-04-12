@@ -71,7 +71,19 @@ struct NetworkErrorView: View {
                 }
                 .chiikawaCard(color: .usagiYellow, radius: 20)
                 .padding(.horizontal, 32)
-                .padding(.bottom, 52)
+                .padding(.bottom, 12)
+                
+                // Switch to Local Mode escape hatch
+                Button {
+                    AppSession.shared.teardownCloudServices()
+                    AppMode.set(.local)
+                } label: {
+                    Text("Skip network (Use Local Mode)")
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .foregroundColor(.inkBrown.opacity(0.6))
+                        .underline()
+                }
+                .padding(.bottom, 40)
             }
             .padding(.horizontal, 24)
         }

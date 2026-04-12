@@ -169,8 +169,8 @@ struct DashboardView: View {
                         .chiikawaCard(color: .chiikawaWhite, radius: 24)
                         .padding(.horizontal)
                         
-                        // ── Invite code card ──
-                        if let code = session.inviteCode {
+                        // ── Invite code card (cloud mode only) ──
+                        if AppMode.current == .cloud, let code = session.inviteCode {
                             HStack(spacing: 12) {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text("Household Code")

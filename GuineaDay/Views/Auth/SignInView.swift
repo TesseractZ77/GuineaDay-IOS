@@ -43,7 +43,11 @@ struct SignInView: View {
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     )
                     VStack(spacing: 12) {
-                        Text("🐾").font(.system(size: 64))
+                        Image("kui")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                            .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 2, y: 3)
                         Text("GuineaDay")
                             .font(.system(size: 32, weight: .black, design: .rounded))
                             .foregroundColor(.inkBrown)

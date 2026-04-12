@@ -38,15 +38,22 @@ final class AppSession: ObservableObject {
     private var membershipListener: ListenerRegistration?  // watches household membership
     
     init() {
-        // Bug 4: Pre-populate from cache so returning users see no flash
+        // Pre-populate from cache so returning cloud users see no flash
         if let cachedHid = UserDefaults.standard.string(forKey: kHouseholdIdKey) {
             self.householdId = cachedHid
         }
         if Auth.auth().currentUser != nil {
             self.isSignedIn = true
         }
-
-        // Bug 1: Start watchdog — if not signed in within 8s, flag as failed
+    }
+    
+    // MARK: - Cloud Services Setup/Teardown
+    
+    /// Boot up Firebase logic properly when in Cloud Mode
+    func setupCloudServices() {
+        guard authListener == nil else { return } // already running
+        
+        // Start watchdog — if not signed in within 8s, flag as failed
         if !isSignedIn {
             watchdogTask = Task {
                 try? await Task.sleep(nanoseconds: 8_000_000_000)
@@ -59,7 +66,7 @@ final class AppSession: ObservableObject {
         authListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             Task { @MainActor in
                 if let user = user {
-                    self?.watchdogTask?.cancel()       // sign-in succeeded
+                    self?.watchdogTask?.cancel()
                     self?.startupFailed = false
                     self?.isSignedIn = true
                     await self?.loadHousehold(for: user.uid)
@@ -70,6 +77,23 @@ final class AppSession: ObservableObject {
                 }
             }
         }
+    }
+    
+    /// Halt background networking entirely when pivoting to Local Mode
+    func teardownCloudServices() {
+        watchdogTask?.cancel()
+        watchdogTask = nil
+        
+        if let listener = authListener {
+            Auth.auth().removeStateDidChangeListener(listener)
+        }
+        authListener = nil
+        
+        membershipListener?.remove()
+        membershipListener = nil
+        
+        // Avoid lingering NetworkErrorView prompts
+        startupFailed = false
     }
     
     // MARK: - Sign In Anonymously

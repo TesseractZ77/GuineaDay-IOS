@@ -13,13 +13,15 @@ struct SettingsView: View {
     @State private var isSavingNickname = false
     @State private var codeCopied       = false
     @State private var showLeaveAlert   = false
-    @State private var memberToRemove: HouseholdMember? = nil   // remove-member alert
-    @State private var isLoading        = true
+    @State private var memberToRemove: HouseholdMember? = nil
+    @State private var isLoading               = true
+    @State private var showRegionChangeAlert   = false
+    @AppStorage("appMode") private var appModeRaw = ""
 
     private var currentUID: String? { Auth.auth().currentUser?.uid }
 
     private var appVersion: String {
-        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1"
 //        let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "v\(v)"
     }
@@ -43,134 +45,151 @@ struct SettingsView: View {
                     ScrollView {
                         VStack(spacing: 20) {
 
-                            // ─── 🏡 Our Home ───────────────────────
-                            settingsSection(title: "🏡 \(session.householdName ?? "Our Home")") {
-
-                                // Household name field
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("HOUSEHOLD NAME")
-                                        .settingsLabel()
-                                    HStack {
-                                        TextField("Give your home a name…", text: $householdName)
-                                            .font(.system(size: 15, design: .rounded))
+                            // ─── 📍 Region ─────────────── always visible ──
+                            settingsSection(title: "📍 Region") {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(AppMode.current == .local ? "🇨🇳 China Mainland" : "🌏 International")
+                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
                                             .foregroundColor(Color.inkBrown)
-                                            .submitLabel(.done)
-                                            .onSubmit { Task { await saveHouseholdName() } }
-                                        if isSavingName {
-                                            ProgressView().tint(Color.inkBrown)
-                                        } else {
-                                            Button("Save") { Task { await saveHouseholdName() } }
-                                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                                .foregroundColor(householdName.trimmed.isEmpty
-                                                                 ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
-                                                .disabled(householdName.trimmed.isEmpty)
-                                        }
+                                        Text(AppMode.current == .local ? "Local only · 本地存储" : "Cloud sync enabled")
+                                            .font(.system(size: 11, design: .rounded))
+                                            .foregroundColor(Color.inkBrown.opacity(0.45))
                                     }
-                                    Divider().background(Color.inkBrown.opacity(0.15))
+                                    Spacer()
+                                    Button("Change") { showRegionChangeAlert = true }
+                                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                                        .foregroundColor(Color.hachiwareBlue)
                                 }
+                            }
 
-                                // Invite code
-                                if let code = session.inviteCode {
+                            // ─── Cloud-only sections ──────────────────────
+                            if AppMode.current == .cloud {
+
+                                // 🏡 Our Home
+                                settingsSection(title: "🏡 \(session.householdName ?? "Our Home")") {
                                     VStack(alignment: .leading, spacing: 8) {
-                                        Text("INVITE CODE")
-                                            .settingsLabel()
+                                        Text("HOUSEHOLD NAME").settingsLabel()
                                         HStack {
-                                            Text(code)
-                                                .font(.system(size: 22, weight: .black, design: .monospaced))
+                                            TextField("Give your home a name…", text: $householdName)
+                                                .font(.system(size: 15, design: .rounded))
                                                 .foregroundColor(Color.inkBrown)
-                                                .tracking(4)
-                                            Spacer()
-                                            Button {
-                                                UIPasteboard.general.string = code
-                                                withAnimation { codeCopied = true }
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                    withAnimation { codeCopied = false }
-                                                }
-                                            } label: {
-                                                Image(systemName: codeCopied ? "checkmark.circle.fill" : "doc.on.doc.fill")
-                                                    .font(.system(size: 22))
-                                                    .foregroundColor(codeCopied ? Color.mintGreen : Color.inkBrown)
+                                                .submitLabel(.done)
+                                                .onSubmit { Task { await saveHouseholdName() } }
+                                            if isSavingName {
+                                                ProgressView().tint(Color.inkBrown)
+                                            } else {
+                                                Button("Save") { Task { await saveHouseholdName() } }
+                                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                                    .foregroundColor(householdName.trimmed.isEmpty
+                                                                     ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
+                                                    .disabled(householdName.trimmed.isEmpty)
                                             }
                                         }
+                                        Divider().background(Color.inkBrown.opacity(0.15))
                                     }
-                                }
-                            }
-
-                            // ─── 👥 Members ────────────────────────
-                            settingsSection(title: "👥 Members") {
-
-                                // My nickname
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("MY NICKNAME")
-                                        .settingsLabel()
-                                    HStack {
-                                        TextField("Set your nickname…", text: $myNickname)
-                                            .font(.system(size: 15, design: .rounded))
-                                            .foregroundColor(Color.inkBrown)
-                                            .submitLabel(.done)
-                                            .onSubmit { Task { await saveNickname() } }
-                                        if isSavingNickname {
-                                            ProgressView().tint(Color.inkBrown)
-                                        } else {
-                                            Button("Save") { Task { await saveNickname() } }
-                                                .font(.system(size: 13, weight: .bold, design: .rounded))
-                                                .foregroundColor(myNickname.trimmed.isEmpty
-                                                                 ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
-                                                .disabled(myNickname.trimmed.isEmpty)
-                                        }
-                                    }
-                                }
-
-                                // Member list
-                                if !session.members.isEmpty {
-                                    Divider().background(Color.inkBrown.opacity(0.15))
-                                        .padding(.vertical, 2)
-                                    Text("IN THIS HOUSEHOLD")
-                                        .settingsLabel()
-                                    VStack(spacing: 10) {
-                                        ForEach(session.members) { member in
-                                            let isMe = member.id == currentUID
-                                            HStack(spacing: 12) {
-                                                // Avatar circle
-                                                ZStack {
-                                                    Circle()
-                                                        .fill(isMe ? Color.usagiYellow : Color.blushPink)
-                                                        .frame(width: 36, height: 36)
-                                                        .overlay(Circle()
-                                                            .stroke(Color.inkBrown, lineWidth: 2))
-                                                    Text(String(member.nickname.prefix(1)).uppercased())
-                                                        .font(.system(size: 14, weight: .black, design: .rounded))
-                                                        .foregroundColor(Color.inkBrown)
-                                                }
-                                                VStack(alignment: .leading, spacing: 1) {
-                                                    Text(member.nickname)
-                                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                                        .foregroundColor(Color.inkBrown)
-                                                    if isMe {
-                                                        Text("You")
-                                                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                                                            .foregroundColor(Color.hachiwareBlue)
-                                                    }
-                                                }
+                                    if let code = session.inviteCode {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text("INVITE CODE").settingsLabel()
+                                            HStack {
+                                                Text(code)
+                                                    .font(.system(size: 22, weight: .black, design: .monospaced))
+                                                    .foregroundColor(Color.inkBrown)
+                                                    .tracking(4)
                                                 Spacer()
-                                                // Remove button (only for OTHER members)
-                                                if !isMe {
-                                                    Button {
-                                                        memberToRemove = member
-                                                    } label: {
-                                                        Image(systemName: "xmark.circle.fill")
-                                                            .font(.system(size: 20))
-                                                            .foregroundColor(Color.blushPink.opacity(0.8))
+                                                Button {
+                                                    UIPasteboard.general.string = code
+                                                    withAnimation { codeCopied = true }
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                        withAnimation { codeCopied = false }
                                                     }
-                                                    .buttonStyle(.plain)
+                                                } label: {
+                                                    Image(systemName: codeCopied ? "checkmark.circle.fill" : "doc.on.doc.fill")
+                                                        .font(.system(size: 22))
+                                                        .foregroundColor(codeCopied ? Color.mintGreen : Color.inkBrown)
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            // ─── ℹ️ About ──────────────────────────
+                                // 👥 Members
+                                settingsSection(title: "👥 Members") {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("MY NICKNAME").settingsLabel()
+                                        HStack {
+                                            TextField("Set your nickname…", text: $myNickname)
+                                                .font(.system(size: 15, design: .rounded))
+                                                .foregroundColor(Color.inkBrown)
+                                                .submitLabel(.done)
+                                                .onSubmit { Task { await saveNickname() } }
+                                            if isSavingNickname {
+                                                ProgressView().tint(Color.inkBrown)
+                                            } else {
+                                                Button("Save") { Task { await saveNickname() } }
+                                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                                    .foregroundColor(myNickname.trimmed.isEmpty
+                                                                     ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
+                                                    .disabled(myNickname.trimmed.isEmpty)
+                                            }
+                                        }
+                                    }
+                                    if !session.members.isEmpty {
+                                        Divider().background(Color.inkBrown.opacity(0.15)).padding(.vertical, 2)
+                                        Text("IN THIS HOUSEHOLD").settingsLabel()
+                                        VStack(spacing: 10) {
+                                            ForEach(session.members) { member in
+                                                let isMe = member.id == currentUID
+                                                HStack(spacing: 12) {
+                                                    ZStack {
+                                                        Circle()
+                                                            .fill(isMe ? Color.usagiYellow : Color.blushPink)
+                                                            .frame(width: 36, height: 36)
+                                                            .overlay(Circle().stroke(Color.inkBrown, lineWidth: 2))
+                                                        Text(String(member.nickname.prefix(1)).uppercased())
+                                                            .font(.system(size: 14, weight: .black, design: .rounded))
+                                                            .foregroundColor(Color.inkBrown)
+                                                    }
+                                                    VStack(alignment: .leading, spacing: 1) {
+                                                        Text(member.nickname)
+                                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                                            .foregroundColor(Color.inkBrown)
+                                                        if isMe {
+                                                            Text("You")
+                                                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                                                .foregroundColor(Color.hachiwareBlue)
+                                                        }
+                                                    }
+                                                    Spacer()
+                                                    if !isMe {
+                                                        Button { memberToRemove = member } label: {
+                                                            Image(systemName: "xmark.circle.fill")
+                                                                .font(.system(size: 20))
+                                                                .foregroundColor(Color.blushPink.opacity(0.8))
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // 🚪 Account (leave household)
+                                settingsSection(title: "Account") {
+                                    Button(role: .destructive) { showLeaveAlert = true } label: {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                            Text("Leave Household")
+                                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                        }
+                                        .foregroundColor(.red.opacity(0.8))
+                                    }
+                                }
+
+                            } // end if .cloud
+
+                            // ─── ℹ️ About ─────────────── always visible ──
                             settingsSection(title: "ℹ️ About") {
                                 HStack {
                                     Text("App Version")
@@ -180,20 +199,6 @@ struct SettingsView: View {
                                     Text(appVersion)
                                         .font(.system(size: 13, design: .rounded))
                                         .foregroundColor(Color.inkBrown.opacity(0.45))
-                                }
-                            }
-
-                            // ─── 🚪 Account ────────────────────────
-                            settingsSection(title: "Account") {
-                                Button(role: .destructive) {
-                                    showLeaveAlert = true
-                                } label: {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                                        Text("Leave Household")
-                                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                    }
-                                    .foregroundColor(.red.opacity(0.8))
                                 }
                             }
 
@@ -215,7 +220,10 @@ struct SettingsView: View {
             }
         }
         .task {
-            // Refresh all household data when the sheet opens
+            guard AppMode.current == .cloud else {
+                isLoading = false  // nothing to fetch in local mode
+                return
+            }
             await session.reloadSettings()
             householdName = session.householdName ?? ""
             myNickname    = session.myNickname    ?? ""
@@ -243,6 +251,27 @@ struct SettingsView: View {
             }
         } message: {
             Text("They will be removed from the household. This cannot be undone.")
+        }
+        .alert("Change Region?", isPresented: $showRegionChangeAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button(AppMode.current == .local ? "Switch to International" : "Switch to China Mainland") {
+                if AppMode.current == .local {
+                    // Switching to Cloud
+                    AppSession.shared.setupCloudServices()
+                    AppMode.set(.cloud)
+                } else {
+                    // Switching to Local
+                    AppSession.shared.teardownCloudServices()
+                    AppMode.set(.local)
+                }
+                dismiss()
+            }
+        } message: {
+            if AppMode.current == .local {
+                Text("Switching to International will enable cloud sync and household features. You'll need to sign in and join or create a household.")
+            } else {
+                Text("Switching to China Mainland will pause cloud sync. The app will run on local storage only. Data added while in local mode won't sync back automatically.")
+            }
         }
     }
 
