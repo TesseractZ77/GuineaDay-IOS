@@ -42,7 +42,8 @@ final class AppSession: ObservableObject {
         if let cachedHid = UserDefaults.standard.string(forKey: kHouseholdIdKey) {
             self.householdId = cachedHid
         }
-        if Auth.auth().currentUser != nil {
+        // Only check Firebase Auth state in cloud mode — avoids SDK init overhead for local users
+        if AppMode.current == .cloud, Auth.auth().currentUser != nil {
             self.isSignedIn = true
         }
     }

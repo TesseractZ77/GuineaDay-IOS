@@ -76,7 +76,7 @@ struct ContentView: View {
         .ignoresSafeArea(edges: .bottom)
         .fontDesign(.rounded)
         .onAppear {
-            if syncManager == nil {
+            if syncManager == nil && AppMode.current == .cloud {
                 syncManager = SyncManager(modelContext: modelContext,
                                           householdId: firestore.householdId)
             }

@@ -116,10 +116,11 @@ final class FirestoreService: ObservableObject {
     }
 
     func listenToScores(onChange: @escaping ([String: Int]) -> Void) -> ListenerRegistration {
-        // In local mode, return an immediately-cancelled no-op listener
+        // In local mode, return an immediately-removed dead handle — no Firestore connection kept open
         guard AppMode.current == .cloud else {
-            return houseRef().collection("scores")
-                .addSnapshotListener { _, _ in }  // attach + immediately return; no data flows
+            let deadListener = houseRef().collection("scores").addSnapshotListener { _, _ in }
+            deadListener.remove()
+            return deadListener
         }
         return houseRef().collection("scores").addSnapshotListener { snap, _ in
             guard let snap else { return }
