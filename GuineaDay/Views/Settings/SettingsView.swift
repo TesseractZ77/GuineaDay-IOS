@@ -4,6 +4,7 @@ import FirebaseAuth
 
 struct SettingsView: View {
     @StateObject private var session = AppSession.shared
+    @EnvironmentObject var lang: LanguageManager
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
@@ -21,7 +22,7 @@ struct SettingsView: View {
     private var currentUID: String? { Auth.auth().currentUser?.uid }
 
     private var appVersion: String {
-        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1"
+        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2"
 //        let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "v\(v)"
     }
@@ -37,41 +38,52 @@ struct SettingsView: View {
                         ProgressView()
                             .tint(Color.inkBrown)
                             .scaleEffect(1.2)
-                        Text("Loading…")
+                        Text(lang.loading)
                             .font(.system(size: 13, design: .rounded))
                             .foregroundColor(Color.inkBrown.opacity(0.5))
                     }
                 } else {
                     ScrollView {
-                        VStack(spacing: 20) {
-
-                            // ─── 📍 Region ─────────────── always visible ──
-                            settingsSection(title: "📍 Region") {
+                        VStack(spacing: 20) {                            // ─── 📍 Region ──────────────────── always visible ──
+                            settingsSection(title: lang.sectionRegion) {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(AppMode.current == .local ? "🇨🇳 China Mainland" : "🌏 International")
+                                        Text(AppMode.current == .local ? lang.regionNameLocal : lang.regionNameCloud)
                                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                                             .foregroundColor(Color.inkBrown)
-                                        Text(AppMode.current == .local ? "Local only · 本地存储" : "Cloud sync enabled")
+                                        Text(AppMode.current == .local ? lang.regionSubLocal : lang.regionSubCloud)
                                             .font(.system(size: 11, design: .rounded))
                                             .foregroundColor(Color.inkBrown.opacity(0.45))
                                     }
                                     Spacer()
-                                    Button("Change") { showRegionChangeAlert = true }
+                                    Button(lang.change) { showRegionChangeAlert = true }
                                         .font(.system(size: 13, weight: .bold, design: .rounded))
                                         .foregroundColor(Color.hachiwareBlue)
                                 }
+                            }
+
+                            // ─── 🌐 Language ────────────────── always visible ──
+                            settingsSection(title: lang.sectionLanguage) {
+                                Picker("", selection: Binding(
+                                    get: { lang.language },
+                                    set: { lang.set($0) }
+                                )) {
+                                    ForEach(AppLanguage.allCases, id: \.self) { lng in
+                                        Text(lng.displayName).tag(lng)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
                             }
 
                             // ─── Cloud-only sections ──────────────────────
                             if AppMode.current == .cloud {
 
                                 // 🏡 Our Home
-                                settingsSection(title: "🏡 \(session.householdName ?? "Our Home")") {
+                                settingsSection(title: "🏡 \(session.householdName ?? lang.sectionHome)") {
                                     VStack(alignment: .leading, spacing: 8) {
-                                        Text("HOUSEHOLD NAME").settingsLabel()
+                                        Text(lang.labelHouseholdName).settingsLabel()
                                         HStack {
-                                            TextField("Give your home a name…", text: $householdName)
+                                            TextField(lang.householdNamePlaceholder, text: $householdName)
                                                 .font(.system(size: 15, design: .rounded))
                                                 .foregroundColor(Color.inkBrown)
                                                 .submitLabel(.done)
@@ -79,7 +91,7 @@ struct SettingsView: View {
                                             if isSavingName {
                                                 ProgressView().tint(Color.inkBrown)
                                             } else {
-                                                Button("Save") { Task { await saveHouseholdName() } }
+                                                Button(lang.save) { Task { await saveHouseholdName() } }
                                                     .font(.system(size: 13, weight: .bold, design: .rounded))
                                                     .foregroundColor(householdName.trimmed.isEmpty
                                                                      ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
@@ -90,7 +102,7 @@ struct SettingsView: View {
                                     }
                                     if let code = session.inviteCode {
                                         VStack(alignment: .leading, spacing: 8) {
-                                            Text("INVITE CODE").settingsLabel()
+                                            Text(lang.labelInviteCode).settingsLabel()
                                             HStack {
                                                 Text(code)
                                                     .font(.system(size: 22, weight: .black, design: .monospaced))
@@ -114,11 +126,11 @@ struct SettingsView: View {
                                 }
 
                                 // 👥 Members
-                                settingsSection(title: "👥 Members") {
+                                settingsSection(title: lang.sectionMembers) {
                                     VStack(alignment: .leading, spacing: 8) {
-                                        Text("MY NICKNAME").settingsLabel()
+                                        Text(lang.labelMyNickname).settingsLabel()
                                         HStack {
-                                            TextField("Set your nickname…", text: $myNickname)
+                                            TextField(lang.nicknamePlaceholder, text: $myNickname)
                                                 .font(.system(size: 15, design: .rounded))
                                                 .foregroundColor(Color.inkBrown)
                                                 .submitLabel(.done)
@@ -126,7 +138,7 @@ struct SettingsView: View {
                                             if isSavingNickname {
                                                 ProgressView().tint(Color.inkBrown)
                                             } else {
-                                                Button("Save") { Task { await saveNickname() } }
+                                                Button(lang.save) { Task { await saveNickname() } }
                                                     .font(.system(size: 13, weight: .bold, design: .rounded))
                                                     .foregroundColor(myNickname.trimmed.isEmpty
                                                                      ? Color.inkBrown.opacity(0.3) : Color.inkBrown)
@@ -136,7 +148,7 @@ struct SettingsView: View {
                                     }
                                     if !session.members.isEmpty {
                                         Divider().background(Color.inkBrown.opacity(0.15)).padding(.vertical, 2)
-                                        Text("IN THIS HOUSEHOLD").settingsLabel()
+                                        Text(lang.labelInHousehold).settingsLabel()
                                         VStack(spacing: 10) {
                                             ForEach(session.members) { member in
                                                 let isMe = member.id == currentUID
@@ -155,7 +167,7 @@ struct SettingsView: View {
                                                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                                                             .foregroundColor(Color.inkBrown)
                                                         if isMe {
-                                                            Text("You")
+                                                            Text(lang.youLabel)
                                                                 .font(.system(size: 10, weight: .bold, design: .rounded))
                                                                 .foregroundColor(Color.hachiwareBlue)
                                                         }
@@ -176,11 +188,11 @@ struct SettingsView: View {
                                 }
 
                                 // 🚪 Account (leave household)
-                                settingsSection(title: "Account") {
+                                settingsSection(title: lang.sectionAccount) {
                                     Button(role: .destructive) { showLeaveAlert = true } label: {
                                         HStack(spacing: 8) {
                                             Image(systemName: "rectangle.portrait.and.arrow.right")
-                                            Text("Leave Household")
+                                            Text(lang.leaveHousehold)
                                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                         }
                                         .foregroundColor(.red.opacity(0.8))
@@ -189,10 +201,10 @@ struct SettingsView: View {
 
                             } // end if .cloud
 
-                            // ─── ℹ️ About ─────────────── always visible ──
-                            settingsSection(title: "ℹ️ About") {
+                            // ─── ℹ️ About ─────────── always visible ──
+                            settingsSection(title: lang.sectionAbout) {
                                 HStack {
-                                    Text("App Version")
+                                    Text(lang.appVersion)
                                         .font(.system(size: 15, design: .rounded))
                                         .foregroundColor(Color.inkBrown)
                                     Spacer()
@@ -209,11 +221,11 @@ struct SettingsView: View {
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(lang.settingsTitle)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Done") { dismiss() }
+                    Button(lang.done) { dismiss() }
                         .font(.system(size: 15, weight: .bold, design: .rounded))
                         .foregroundColor(Color.inkBrown)
                 }
@@ -229,38 +241,36 @@ struct SettingsView: View {
             myNickname    = session.myNickname    ?? ""
             isLoading     = false
         }
-        .alert("Leave Household?", isPresented: $showLeaveAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button("Leave", role: .destructive) {
+        .alert(lang.leaveAlertTitle, isPresented: $showLeaveAlert) {
+            Button(lang.cancel, role: .cancel) {}
+            Button(lang.leave, role: .destructive) {
                 Task {
                     await session.leaveHousehold(modelContext: modelContext)
                     dismiss()
                 }
             }
         } message: {
-            Text("Your local data will be cleared. You can join or create a new household.")
+            Text(lang.leaveAlertMsg)
         }
-        .alert("Remove \(memberToRemove?.nickname ?? "this member")?",
+        .alert("\(lang.remove) \(memberToRemove?.nickname ?? "")?",
                isPresented: Binding(get: { memberToRemove != nil }, set: { if !$0 { memberToRemove = nil } })) {
-            Button("Cancel", role: .cancel) { memberToRemove = nil }
-            Button("Remove", role: .destructive) {
+            Button(lang.cancel, role: .cancel) { memberToRemove = nil }
+            Button(lang.remove, role: .destructive) {
                 if let m = memberToRemove {
                     Task { try? await session.removeMember(uid: m.id) }
                     memberToRemove = nil
                 }
             }
         } message: {
-            Text("They will be removed from the household. This cannot be undone.")
+            Text(lang.removeMemberMsg)
         }
-        .alert("Change Region?", isPresented: $showRegionChangeAlert) {
-            Button("Cancel", role: .cancel) {}
-            Button(AppMode.current == .local ? "Switch to International" : "Switch to China Mainland") {
+        .alert(lang.changeRegionTitle, isPresented: $showRegionChangeAlert) {
+            Button(lang.cancel, role: .cancel) {}
+            Button(AppMode.current == .local ? lang.switchToIntl : lang.switchToChina) {
                 if AppMode.current == .local {
-                    // Switching to Cloud
                     AppSession.shared.setupCloudServices()
                     AppMode.set(.cloud)
                 } else {
-                    // Switching to Local
                     AppSession.shared.teardownCloudServices()
                     AppMode.set(.local)
                 }
@@ -268,9 +278,9 @@ struct SettingsView: View {
             }
         } message: {
             if AppMode.current == .local {
-                Text("Switching to International will enable cloud sync and household features. You'll need to sign in and join or create a household.")
+                Text(lang.changeRegionToCloudMsg)
             } else {
-                Text("Switching to China Mainland will pause cloud sync. The app will run on local storage only. Data added while in local mode won't sync back automatically.")
+                Text(lang.changeRegionToLocalMsg)
             }
         }
     }

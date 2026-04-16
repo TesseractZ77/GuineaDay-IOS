@@ -17,6 +17,7 @@ private enum SheetDestination: Identifiable {
 struct ProfileListView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
     @Query(sort: \GuineaPig.name) private var guineaPigs: [GuineaPig]
 
     @State private var sheetDestination: SheetDestination?  // single sheet state
@@ -34,10 +35,10 @@ struct ProfileListView: View {
                         // Header banner (title only — + button is a ZStack overlay below)
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("My Piggies 🐾")
+                                Text(lang.myPiggiesTitle)
                                     .font(.system(size: 28, weight: .black, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
-                                Text("\(guineaPigs.count) fuzzy friend\(guineaPigs.count == 1 ? "" : "s")")
+                                Text(lang.piggyCount(guineaPigs.count))
                                     .font(.system(size: 13, design: .rounded))
                                     .foregroundStyle(Color.inkBrown.opacity(0.6))
                             }
@@ -50,10 +51,10 @@ struct ProfileListView: View {
                             // Empty state
                             VStack(spacing: 16) {
                                 Text("🐾").font(.system(size: 60))
-                                Text("No piggies yet!")
+                                Text(lang.noPiggiesYet)
                                     .font(.system(size: 20, weight: .bold, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
-                                Text("Tap + to add your first guinea pig")
+                                Text(lang.addFirstPiggy)
                                     .font(.system(size: 14, design: .rounded))
                                     .foregroundStyle(Color.inkBrown.opacity(0.5))
                             }
@@ -73,7 +74,7 @@ struct ProfileListView: View {
                                     .buttonStyle(.plain)
                                     .contextMenu {
                                         Button(role: .destructive) { pigToDelete = pig }
-                                            label: { Label("Delete", systemImage: "trash") }
+                                            label: { Label(lang.delete, systemImage: "trash") }
                                     }
                                 }
                             }
@@ -83,7 +84,7 @@ struct ProfileListView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "hand.tap")
                                     .font(.system(size: 10))
-                                Text("Long press a card to delete")
+                                Text(lang.longPressHint)
                                     .font(.system(size: 10, design: .rounded))
                             }
                             .foregroundStyle(Color.inkBrown.opacity(0.3))
@@ -109,17 +110,17 @@ struct ProfileListView: View {
                 }
             }
             // Bug 3: delete confirmation alert
-            .alert("Delete \(pigToDelete?.name ?? "Piggy")?", isPresented: Binding(
+            .alert("\(lang.delete) \(pigToDelete?.name ?? "")?", isPresented: Binding(
                 get:  { pigToDelete != nil },
                 set:  { if !$0 { pigToDelete = nil } }
             )) {
-                Button("Delete", role: .destructive) {
+                Button(lang.delete, role: .destructive) {
                     if let pig = pigToDelete { deletePig(pig) }
                     pigToDelete = nil
                 }
-                Button("Cancel", role: .cancel) { pigToDelete = nil }
+                Button(lang.cancel, role: .cancel) { pigToDelete = nil }
             } message: {
-                Text("This will permanently remove \(pigToDelete?.name ?? "this piggy") for everyone in your household.")
+                Text(lang.deletePiggyMsg)
             }
         }
     }
@@ -133,17 +134,25 @@ struct ProfileListView: View {
     }
 }
 
-// MARK: - Pig Card
 struct PigCard: View {
+    @EnvironmentObject var lang: LanguageManager
+
     func ageString(from birthday: Date) -> String {
         let components = Calendar.current.dateComponents([.year, .month], from: birthday, to: Date())
         let years  = components.year  ?? 0
         let months = components.month ?? 0
 
-        if years == 0 && months == 0 { return "< 1 month old" }
-        if years == 0 { return "\(months) month\(months == 1 ? "" : "s") old" }
-        if months == 0 { return "\(years) yr\(years == 1 ? "" : "s") old" }
-        return "\(years) yr\(years == 1 ? "" : "s") \(months) mo old"
+        if lang.isZh {
+            if years == 0 && months == 0 { return "< 1 个月" }
+            if years == 0 { return "\(months) 个月" }
+            if months == 0 { return "\(years) 岁" }
+            return "\(years) 岁 \(months) 个月"
+        } else {
+            if years == 0 && months == 0 { return "< 1 month old" }
+            if years == 0 { return "\(months) month\(months == 1 ? "" : "s") old" }
+            if months == 0 { return "\(years) yr\(years == 1 ? "" : "s") old" }
+            return "\(years) yr\(years == 1 ? "" : "s") \(months) mo old"
+        }
     }
 
     let pig: GuineaPig

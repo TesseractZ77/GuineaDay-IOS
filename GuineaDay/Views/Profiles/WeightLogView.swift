@@ -6,6 +6,7 @@ struct WeightLogView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var guineaPig: GuineaPig
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
 
 
     // @Query keeps the list reactive — filter to this pig in Swift
@@ -28,7 +29,7 @@ struct WeightLogView: View {
 
             // ── Header ──
             HStack {
-                ChiikawaSectionHeader(title: "Weight Tracker", color: Color.mintGreen, icon: "scalemass.fill")
+                ChiikawaSectionHeader(title: lang.weightTracker, color: Color.mintGreen, icon: "scalemass.fill")
                 Spacer()
                 Button(action: { withAnimation { isAdding.toggle() } }) {
                     ZStack {
@@ -66,7 +67,7 @@ struct WeightLogView: View {
                             .foregroundColor(Color.inkBrown)
                     }
 
-                    Button("Save") { addWeight() }
+                    Button(lang.save) { addWeight() }
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundColor(Color.inkBrown)
                         .padding(.horizontal, 12)
@@ -85,7 +86,7 @@ struct WeightLogView: View {
             }
 
             if pigLogs.isEmpty {
-                Text("No records yet — add your first weigh-in!")
+                Text(lang.noWeightRecords)
                     .font(.system(size: 13, design: .rounded))
                     .foregroundStyle(Color.inkBrown.opacity(0.5))
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -105,7 +106,7 @@ struct WeightLogView: View {
                                 if let idx = chartLogs.firstIndex(where: { $0.persistentModelID == log.persistentModelID }),
                                    idx > 0 {
                                     let diff = log.weightGrams - chartLogs[idx - 1].weightGrams
-                                    Text(diff == 0 ? "No change" : (diff > 0 ? "+\(diff)g" : "\(diff)g"))
+                                    Text(diff == 0 ? lang.noChange : (diff > 0 ? "+\(diff)g" : "\(diff)g"))
                                         .font(.system(size: 10, design: .rounded))
                                         .foregroundStyle(diff > 0 ? Color.hachiwareBlue : (diff < 0 ? Color.blushPink : Color.inkBrown.opacity(0.4)))
                                 }
@@ -145,7 +146,7 @@ struct WeightLogView: View {
     @ViewBuilder
     var weightChart: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Weight History")
+            Text(lang.weightHistory)
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.inkBrown.opacity(0.6))
 

@@ -40,6 +40,7 @@ struct ContentView: View {
     @State private var selectedTab: AppTab = .home
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
     @State private var syncManager: SyncManager?
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -91,11 +92,22 @@ struct ContentView: View {
 // MARK: - Chiikawa Floating Tab Bar
 struct ChiikawaTabBar: View {
     @Binding var selected: AppTab
+    @EnvironmentObject var lang: LanguageManager
+
+    func label(for tab: AppTab) -> String {
+        switch tab {
+        case .home:    return lang.tabHome
+        case .duties:  return lang.tabDuties
+        case .gallery: return lang.tabGallery
+        case .piggies: return lang.tabPiggies
+        case .game:    return lang.tabPlay
+        }
+    }
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(AppTab.allCases, id: \.rawValue) { tab in
-                TabBarButton(tab: tab, isSelected: selected == tab) {
+                TabBarButton(tab: tab, label: label(for: tab), isSelected: selected == tab) {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         selected = tab
                     }
@@ -114,6 +126,7 @@ struct ChiikawaTabBar: View {
 // MARK: - Individual Tab Button
 struct TabBarButton: View {
     let tab: AppTab
+    let label: String
     let isSelected: Bool
     let action: () -> Void
 
@@ -138,7 +151,7 @@ struct TabBarButton: View {
                 }
                 .frame(height: 34)
 
-                Text(tab.label)
+                Text(label)
                     .font(.system(size: 9, weight: isSelected ? .bold : .medium, design: .rounded))
                     .foregroundColor(Color.inkBrown)
             }

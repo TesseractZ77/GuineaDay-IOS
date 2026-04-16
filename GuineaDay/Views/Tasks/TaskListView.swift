@@ -5,6 +5,7 @@ struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskItem.dueDate) private var tasks: [TaskItem]
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
     @State private var showingAddTask = false
 
     var pending:   [TaskItem] { tasks.filter { !$0.isCompleted } }
@@ -19,9 +20,9 @@ struct TaskListView: View {
                     VStack(spacing: 20) {
                         // Section: Pending
                         VStack(alignment: .leading, spacing: 12) {
-                            ChiikawaSectionHeader(title: "To-Do (\(pending.count))", color: .usagiYellow, icon: "clock.fill")
+                            ChiikawaSectionHeader(title: lang.todoBadge(pending.count), color: .usagiYellow, icon: "clock.fill")
                             if pending.isEmpty {
-                                emptyState(icon: "checkmark.circle", message: "All done — great job! 🎉")
+                                emptyState(icon: "checkmark.circle", message: lang.allDoneEmpty)
                             } else {
                                 ForEach(pending) { task in
                                     TaskRow(task: task, onDelete: { deleteTask(task) })
@@ -33,7 +34,7 @@ struct TaskListView: View {
                         // Section: Completed
                         if !completed.isEmpty {
                             VStack(alignment: .leading, spacing: 12) {
-                                ChiikawaSectionHeader(title: "Done (\(completed.count))", color: .mintGreen, icon: "checkmark.circle.fill")
+                                ChiikawaSectionHeader(title: lang.doneBadge(completed.count), color: .mintGreen, icon: "checkmark.circle.fill")
                                 ForEach(completed) { task in
                                     TaskRow(task: task, onDelete: { deleteTask(task) })
                                 }
@@ -47,7 +48,7 @@ struct TaskListView: View {
                     .padding(.top, 16)
                 }
             }
-            .navigationTitle("Duties")
+            .navigationTitle(lang.dutiestitle)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -80,6 +81,7 @@ struct TaskListView: View {
 struct TaskRow: View {
     @Bindable var task: TaskItem
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
     let onDelete: () -> Void
 
     @State private var recurringFlash = false
@@ -142,12 +144,12 @@ struct TaskRow: View {
                     HStack(spacing: 4) {
                         Text(task.dueDate, style: .date)
                         Text("·")
-                        Text(task.category.capitalized)
+                        Text(lang.localizedCategory(task.category))
                         if task.isRecurring {
                             Text("·")
                             Image(systemName: "arrow.trianglehead.2.clockwise")
                                 .font(.system(size: 9))
-                            Text(task.recurrenceRule.capitalized)
+                            Text(lang.localizedRecurrence(task.recurrenceRule))
                         }
                         if task.reminderEnabled {
                             Text("·")
@@ -179,7 +181,7 @@ struct TaskRow: View {
         .shadow(color: Color.inkBrown.opacity(0.4), radius: 0, x: 2, y: 3)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive, action: onDelete) {
-                Label("Delete", systemImage: "trash")
+                Label(lang.delete, systemImage: "trash")
             }
         }
     }
@@ -219,6 +221,7 @@ struct TaskRow: View {
 // MARK: - Priority Badge
 struct PriorityBadge: View {
     let priority: String
+    @EnvironmentObject var lang: LanguageManager
 
     var color: Color {
         switch priority.lowercased() {
@@ -229,7 +232,7 @@ struct PriorityBadge: View {
     }
 
     var body: some View {
-        Text(priority.capitalized)
+        Text(lang.localizedPriority(priority))
             .font(.system(size: 10, weight: .bold, design: .rounded))
             .foregroundColor(.inkBrown)
             .padding(.horizontal, 8).padding(.vertical, 4)

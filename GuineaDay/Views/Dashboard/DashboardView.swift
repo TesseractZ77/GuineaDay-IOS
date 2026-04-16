@@ -8,9 +8,10 @@ struct DashboardView: View {
     @AppStorage("customMascotFilename") private var customMascotFilename: String = ""
     @State private var showMascotPicker = false
     @State private var customMascotItem: PhotosPickerItem?
-    @State private var showSettings     = false   // Settings sheet
+    @State private var showSettings     = false
     @Environment(\.modelContext) private var modelContext
     @StateObject private var session = AppSession.shared
+    @EnvironmentObject var lang: LanguageManager
     @State private var codeCopied = false
     @Query private var tasks: [TaskItem]
     @Query private var pigs: [GuineaPig]
@@ -53,7 +54,13 @@ struct DashboardView: View {
                         // ── Top banner: date + weather ──
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(Date().formatted(.dateTime.weekday(.wide).month().day()))
+                                Text(Date().formatted(
+                                .dateTime
+                                .weekday(.wide)
+                                .month()
+                                .day()
+                                .locale(Locale(identifier: lang.isZh ? "zh_CN" : "en_US"))
+                            ))
                                     .font(.system(size: 18, weight: .bold, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
                             }
@@ -122,10 +129,10 @@ struct DashboardView: View {
 
 
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text("GuineaDay ✦")
+                                    Text(lang.welcomeTitle)
                                         .font(.system(size: 26, weight: .black, design: .rounded))
                                         .foregroundStyle(Color.inkBrown)
-                                    Text("Welcome back!\nYour piggies miss you~ 🥕")
+                                    Text(lang.welcomeBody)
                                         .font(.system(size: 13, weight: .medium, design: .rounded))
                                         .foregroundStyle(Color.inkBrown.opacity(0.8))
                                         .lineSpacing(3)
@@ -142,13 +149,13 @@ struct DashboardView: View {
                         // ── Stats row ──
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                             Button { selectedTab = .piggies } label: {
-                                DashStatCard(icon: "pawprint.fill",  value: "\(pigs.count)",    label: "Piggies",  color: .blushPink)
+                                DashStatCard(icon: "pawprint.fill",  value: "\(pigs.count)",    label: lang.statPiggies,  color: .blushPink)
                             }.buttonStyle(.plain)
                             Button { selectedTab = .duties } label: {
-                                DashStatCard(icon: "checkmark.circle.fill", value: "\(pendingCount)", label: "To-Do", color: .usagiYellow)
+                                DashStatCard(icon: "checkmark.circle.fill", value: "\(pendingCount)", label: lang.statTodo, color: .usagiYellow)
                             }.buttonStyle(.plain)
                             Button { selectedTab = .gallery } label: {
-                                DashStatCard(icon: "photo.stack.fill", value: "\(photos.count)", label: "Memories", color: .lavenderPurple)
+                                DashStatCard(icon: "photo.stack.fill", value: "\(photos.count)", label: lang.statMemories, color: .lavenderPurple)
                             }.buttonStyle(.plain)
                         }
                         .padding(.horizontal)
@@ -156,12 +163,12 @@ struct DashboardView: View {
 
                         // ── Quick tips ──
                         VStack(alignment: .leading, spacing: 12) {
-                            ChiikawaSectionHeader(title: "Piggy Tips", color: .mintGreen, icon: "lightbulb.fill")
+                            ChiikawaSectionHeader(title: lang.sectionTips, color: .mintGreen, icon: "lightbulb.fill")
                             VStack(spacing: 10) {
-                                TipRow(emoji: "🥕", tip: "Guinea pigs need fresh veggies daily!")
-                                TipRow(emoji: "💧", tip: "Fresh water every day — no exceptions.")
-                                TipRow(emoji: "🥰", tip: "At least 1 hour of floor time keeps them happy.")
-                                TipRow(emoji: "❤️", tip: "Guinea pigs are social — they love company!")
+                                TipRow(emoji: "🥕", tip: lang.tip1)
+                                TipRow(emoji: "💧", tip: lang.tip2)
+                                TipRow(emoji: "🥰", tip: lang.tip3)
+                                TipRow(emoji: "❤️", tip: lang.tip4)
                             }
                         }
                         .padding()
@@ -173,7 +180,7 @@ struct DashboardView: View {
                         if AppMode.current == .cloud, let code = session.inviteCode {
                             HStack(spacing: 12) {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text("Household Code")
+                                    Text(lang.householdCode)
                                         .font(.system(size: 11, weight: .bold, design: .rounded))
                                         .foregroundColor(.inkBrown.opacity(0.6))
                                     Text(code)
@@ -208,7 +215,7 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showMascotPicker) {
                 VStack(spacing: 20) {
-                    Text("Choose Your Mascot")
+                    Text(lang.chooseMascot)
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(Color.inkBrown)
                         .padding(.top, 90)
@@ -271,7 +278,7 @@ struct DashboardView: View {
                                     }
                                 }
                             }
-                            Text("Your Own")
+                            Text(lang.yourOwn)
                                 .font(.system(size: 11, design: .rounded))
                                 .foregroundColor(Color.inkBrown)
                         }

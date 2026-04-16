@@ -7,6 +7,7 @@ struct ProfileEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
 
     
     let guineaPig: GuineaPig?
@@ -14,7 +15,7 @@ struct ProfileEditView: View {
     @State private var name = ""
     @State private var birthDate = Date()
     @State private var breed = "American"
-    @State private var gender = "Male"
+    @State private var gender = "Boar"
     
     // Photo handling
     @State private var selectedItem: PhotosPickerItem?
@@ -46,7 +47,7 @@ struct ProfileEditView: View {
                 Color.wallGray.ignoresSafeArea()
                 
                 Form {
-                    Section(header: Text("Photo").foregroundStyle(Color.inkBrown)) {
+                    Section(header: Text(lang.isZh ? "照片" : "Photo").foregroundStyle(Color.inkBrown)) {
                         HStack {
                             Spacer()
                             PhotosPicker(selection: $selectedItem, matching: .images) {
@@ -82,7 +83,7 @@ struct ProfileEditView: View {
                                     VStack {
                                         Image(systemName: "photo.badge.plus")
                                             .font(.largeTitle)
-                                        Text("Add Photo")
+                                        Text(lang.isZh ? "添加照片" : "Add Photo")
                                             .font(.caption)
                                     }
                                     .frame(width: 120, height: 120)
@@ -106,18 +107,19 @@ struct ProfileEditView: View {
                     }
                     .listRowBackground(Color.chiikawaWhite)
                     
-                    Section(header: Text("Details").foregroundStyle(Color.inkBrown)) {
+                    Section(header: Text(lang.isZh ? "详细信息" : "Details").foregroundStyle(Color.inkBrown)) {
                         HStack {
-                            Text("Name")
-                            TextField("Name", text: $name)
+                            Text(lang.isZh ? "名字" : "Name")
+                            TextField(lang.isZh ? "名字" : "Name", text: $name)
                                 .multilineTextAlignment(.trailing)
                         }
-                        DatePicker("Birthday", selection: $birthDate, displayedComponents: .date)
-                        Picker("Breed", selection: $breed) {
+                        DatePicker(lang.isZh ? "生日" : "Birthday", selection: $birthDate, displayedComponents: .date)
+                        Picker(lang.isZh ? "品种" : "Breed", selection: $breed) {
                             ForEach(breeds, id: \.self) { Text($0) }
                         }
-                        Picker("Gender", selection: $gender) {
-                            ForEach(genders, id: \.self) { Text($0) }
+                        Picker(lang.isZh ? "性别" : "Gender", selection: $gender) {
+                            Text(lang.genderBoar).tag("Boar")
+                            Text(lang.genderSow).tag("Sow")
                         }
                     }
                     .listRowBackground(Color.chiikawaWhite)
@@ -125,7 +127,7 @@ struct ProfileEditView: View {
                     
                     // Show weight log if editing an existing pig
                     if let pig = guineaPig {
-                        Section(header: Text("Health").foregroundStyle(Color.inkBrown)) {
+                        Section(header: Text(lang.isZh ? "健康" : "Health").foregroundStyle(Color.inkBrown)) {
                             WeightLogView(guineaPig: pig)
                                 .listRowInsets(EdgeInsets())
                                 .listRowBackground(Color.clear)
@@ -134,11 +136,11 @@ struct ProfileEditView: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle(guineaPig == nil ? "New Piggy" : "Edit Profile")
+            .navigationTitle(guineaPig == nil ? lang.addPiggy : lang.editPiggy)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(lang.cancel) { dismiss() }
                         .foregroundStyle(Color.inkBrown)
                         .disabled(isSaving)
                 }
@@ -147,22 +149,22 @@ struct ProfileEditView: View {
                         ProgressView()
                             .tint(Color.inkBrown)
                     } else {
-                        Button("Save") { saveProfile() }
+                        Button(lang.save) { saveProfile() }
                             .foregroundStyle(Color.inkBrown)
                             .disabled(name.isEmpty)
                     }
                 }
             }
         }
-        .alert("Photo Upload Failed", isPresented: $uploadFailedAlert) {
+        .alert(lang.photoUploadFailedProfile, isPresented: $uploadFailedAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("Could not upload the photo. Please check your internet connection and try again.")
+            Text(lang.isZh ? "照片无法上传，请检查网络连接后重试。" : "Could not upload the photo. Please check your internet connection and try again.")
         }
-        .alert("Photo Not Available Offline", isPresented: $photoLoadFailedAlert) {
+        .alert(lang.photoNotAvailableProfile, isPresented: $photoLoadFailedAlert) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text("This photo could not be loaded. If your iPhone uses iCloud Photo Library with 'Optimize Storage', the photo may only exist in iCloud. Connect to the internet to download it first, then try again.")
+            Text(lang.photoNotAvailableProfileMsg)
         }
     }
     

@@ -7,6 +7,7 @@ struct GalleryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Photo.dateTaken, order: .reverse) private var photos: [Photo]
     @EnvironmentObject var firestore: FirestoreService
+    @EnvironmentObject var lang: LanguageManager
 
     @State private var selectedItems: [PhotosPickerItem] = []
     @State private var zoomedPhoto: Photo?
@@ -25,10 +26,10 @@ struct GalleryView: View {
                         // Header (title only — + button is a ZStack overlay below)
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Memories 🌸")
+                                Text(lang.memoriesTitle)
                                     .font(.system(size: 28, weight: .black, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
-                                Text("\(photos.count) photo\(photos.count == 1 ? "" : "s")")
+                                Text(lang.isZh ? "\(photos.count) 张照片" : "\(photos.count) photo\(photos.count == 1 ? "" : "s")")
                                     .font(.system(size: 13, design: .rounded))
                                     .foregroundStyle(Color.inkBrown.opacity(0.6))
                             }
@@ -40,10 +41,10 @@ struct GalleryView: View {
                         if photos.isEmpty {
                             VStack(spacing: 16) {
                                 Text("📷").font(.system(size: 60))
-                                Text("No memories yet!")
+                                Text(lang.noPhotosYet)
                                     .font(.system(size: 20, weight: .bold, design: .rounded))
                                     .foregroundStyle(Color.inkBrown)
-                                Text("Tap + to add your first photo")
+                                Text(lang.addFirstPhoto)
                                     .font(.system(size: 14, design: .rounded))
                                     .foregroundStyle(Color.inkBrown.opacity(0.5))
                             }
@@ -78,7 +79,7 @@ struct GalleryView: View {
                                     .onTapGesture { zoomedPhoto = photo }
                                     .contextMenu {
                                         Button(role: .destructive) { deletePhoto(photo) }
-                                            label: { Label("Delete", systemImage: "trash") }
+                                            label: { Label(lang.delete, systemImage: "trash") }
                                     }
                                 }
 
@@ -143,15 +144,15 @@ struct GalleryView: View {
 
                 }
             }
-            .alert("Photo Upload Failed", isPresented: $uploadFailedAlert) {
+            .alert(lang.photoUploadFailed, isPresented: $uploadFailedAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("Could not upload the photo. Please check your internet connection and try again.")
+                Text(lang.photoUploadFailedMsg)
             }
-            .alert("Photo Not Available Offline", isPresented: $photoLoadFailedAlert) {
+            .alert(lang.photoNotAvailable, isPresented: $photoLoadFailedAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("One or more photos could not be loaded. If your iPhone uses iCloud Photo Library with 'Optimize Storage', the original photo may only exist in iCloud. Connect to the internet to download it first, then try again.")
+                Text(lang.photoNotAvailableMsg)
             }
         }
     }

@@ -25,7 +25,7 @@ struct RegionSelectionView: View {
                         .opacity(animateIn ? 1 : 0)
                         .shadow(color: Color.inkBrown.opacity(0.3), radius: 0, x: 2, y: 3)
 
-                    Text("Guinea Day")
+                    Text("GuineaDay")
                         .font(.system(size: 32, weight: .black, design: .rounded))
                         .foregroundStyle(Color.inkBrown)
                         .opacity(animateIn ? 1 : 0)
@@ -84,6 +84,8 @@ struct RegionSelectionView: View {
 
     private func choose(_ mode: AppMode) {
         withAnimation(.easeInOut(duration: 0.2)) {
+            // Auto-set language to match region selection
+            LanguageManager.shared.set(mode == .local ? .simplifiedChinese : .english)
             AppMode.set(mode)
             onSelected()
         }

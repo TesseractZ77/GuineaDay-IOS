@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HouseholdSetupView: View {
     @StateObject private var session = AppSession.shared
+    @EnvironmentObject var lang: LanguageManager
     @State private var inviteCodeInput = ""
     @State private var isLoading = false
     @State private var error: String?
@@ -21,10 +22,10 @@ struct HouseholdSetupView: View {
                 VStack(spacing: 24) {
                     // ── Header ──
                     VStack(spacing: 6) {
-                        Text("Set Up Your Home")
+                        Text(lang.setupTitle)
                             .font(.system(size: 28, weight: .black, design: .rounded))
                             .foregroundColor(.inkBrown)
-                        Text("Create a home or join your partner's 🏡")
+                        Text(lang.setupSubtitle)
                             .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundColor(.inkBrown.opacity(0.65))
                             .multilineTextAlignment(.center)
@@ -42,8 +43,8 @@ struct HouseholdSetupView: View {
 
                     // ── Create new home card ──
                     VStack(spacing: 16) {
-                        ChiikawaSectionHeader(title: "Start Fresh", color: .usagiYellow, icon: "house.fill")
-                        Text("Create a new shared home.\nYou'll get an invite code to share with your partner.")
+                        ChiikawaSectionHeader(title: lang.sectionStartFresh, color: .usagiYellow, icon: "house.fill")
+                        Text(lang.startFreshDesc)
                             .font(.system(size: 13, design: .rounded))
                             .foregroundColor(.inkBrown.opacity(0.75))
                             .multilineTextAlignment(.center)
@@ -51,7 +52,7 @@ struct HouseholdSetupView: View {
                         if let code = session.inviteCode {
                             // ── Show code after creation ──
                             VStack(spacing: 8) {
-                                Text("Share this code with your partner 🏡")
+                                Text(lang.shareCodePrompt)
                                     .font(.system(size: 13, design: .rounded))
                                     .foregroundColor(.inkBrown.opacity(0.7))
                                     .multilineTextAlignment(.center)
@@ -61,7 +62,7 @@ struct HouseholdSetupView: View {
                                 Button {
                                     UIPasteboard.general.string = code
                                 } label: {
-                                    Label("Copy Code", systemImage: "doc.on.doc.fill")
+                                    Label(lang.copyCode, systemImage: "doc.on.doc.fill")
                                         .font(.system(size: 13, weight: .bold, design: .rounded))
                                         .foregroundColor(.inkBrown)
                                         .padding(.horizontal, 16)
@@ -82,7 +83,7 @@ struct HouseholdSetupView: View {
                             }) {
                                 HStack {
                                     Image(systemName: "plus.circle.fill")
-                                    Text("Create a New Home")
+                                    Text(lang.createNewHome)
                                         .fontWeight(.bold)
                                 }
                                 .frame(maxWidth: .infinity)
@@ -101,15 +102,15 @@ struct HouseholdSetupView: View {
                     // ── Divider ──
                     HStack {
                         Rectangle().fill(Color.inkBrown.opacity(0.2)).frame(height: 1.5)
-                        Text("or").font(.system(size: 13, weight: .bold, design: .rounded)).foregroundColor(.inkBrown.opacity(0.5))
+                        Text(lang.orDivider).font(.system(size: 13, weight: .bold, design: .rounded)).foregroundColor(.inkBrown.opacity(0.5))
                         Rectangle().fill(Color.inkBrown.opacity(0.2)).frame(height: 1.5)
                     }
                     .padding(.horizontal, 32)
 
                     // ── Join with invite code card ──
                     VStack(spacing: 16) {
-                        ChiikawaSectionHeader(title: "Join a Home", color: .hachiwareBlue, icon: "person.2.fill")
-                        Text("Got an invite code from your partner?\nEnter it below to join their home.")
+                        ChiikawaSectionHeader(title: lang.sectionJoinHome, color: .hachiwareBlue, icon: "person.2.fill")
+                        Text(lang.joinHomeDesc)
                             .font(.system(size: 13, design: .rounded))
                             .foregroundColor(.inkBrown.opacity(0.75))
                             .multilineTextAlignment(.center)
@@ -135,7 +136,7 @@ struct HouseholdSetupView: View {
                         }) {
                             HStack {
                                 Image(systemName: "arrow.right.circle.fill")
-                                Text("Join with Code")
+                                Text(lang.joinWithCode)
                                     .fontWeight(.bold)
                             }
                             .frame(maxWidth: .infinity)

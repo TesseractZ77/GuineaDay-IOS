@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var session = AppSession.shared
+    @StateObject private var lang = LanguageManager.shared
     // @AppStorage mirrors UserDefaults — any write auto-triggers re-render here
     @AppStorage("hasShownRegionSelector") private var hasShownRegionSelector = false
     @AppStorage("appMode")               private var appModeRaw              = ""
@@ -46,6 +47,7 @@ struct RootView: View {
                 }
             }
         }
+        .environmentObject(lang)  // all descendant views can access via @EnvironmentObject var lang: LanguageManager
         .animation(.easeInOut, value: hasShownRegionSelector)
         .animation(.easeInOut, value: appModeRaw)
         .animation(.easeInOut, value: session.startupFailed)
@@ -67,10 +69,10 @@ struct RootView: View {
                     .font(.system(size: 64))
 
                 VStack(spacing: 8) {
-                    Text("Your Invite Code")
+                    Text(lang.inviteCodeTitle)
                         .font(.system(size: 26, weight: .black, design: .rounded))
                         .foregroundColor(.inkBrown)
-                    Text("Share this with your partner so they can join your home")
+                    Text(lang.inviteCodeSubtitle)
                         .font(.system(size: 14, design: .rounded))
                         .foregroundColor(.inkBrown.opacity(0.65))
                         .multilineTextAlignment(.center)
@@ -87,7 +89,7 @@ struct RootView: View {
                     Button {
                         UIPasteboard.general.string = code
                     } label: {
-                        Label("Copy Code", systemImage: "doc.on.doc.fill")
+                        Label(lang.copyCode, systemImage: "doc.on.doc.fill")
                             .fontWeight(.bold)
                             .foregroundColor(.inkBrown)
                             .frame(maxWidth: .infinity)
@@ -101,7 +103,7 @@ struct RootView: View {
 
                 Spacer()
 
-                Button("Continue to App →") {
+                Button(lang.continueToApp) {
                     session.showingInviteCode = false
                 }
                 .font(.system(size: 15, weight: .bold, design: .rounded))

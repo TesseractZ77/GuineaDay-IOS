@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// Shown when Firebase is unreachable (common for users in mainland China).
-/// Displayed in both English and Simplified Chinese.
 struct NetworkErrorView: View {
+    @EnvironmentObject var lang: LanguageManager
     let onRetry: () -> Void
 
     var body: some View {
@@ -23,32 +23,13 @@ struct NetworkErrorView: View {
                         .font(.system(size: 48))
                 }
 
-                // Title & body — English
+                // Title & body
                 VStack(spacing: 8) {
-                    Text("Unable to Connect")
+                    Text(lang.networkErrorTitle)
                         .font(.system(size: 24, weight: .black, design: .rounded))
                         .foregroundColor(.inkBrown)
 
-                    Text("GuineaDay requires access to international network services (Firebase). If you're in mainland China, please use a VPN and try again.")
-                        .font(.system(size: 14, design: .rounded))
-                        .foregroundColor(.inkBrown.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
-                }
-
-                // Divider
-                Rectangle()
-                    .fill(Color.inkBrown.opacity(0.15))
-                    .frame(height: 1)
-                    .padding(.horizontal, 32)
-
-                // Title & body — Chinese
-                VStack(spacing: 8) {
-                    Text("无法连接")
-                        .font(.system(size: 24, weight: .black, design: .rounded))
-                        .foregroundColor(.inkBrown)
-
-                    Text("GuineaDay 需要访问国际网络服务（Firebase）。如果您在中国大陆，请使用 VPN 后重试。")
+                    Text(lang.networkErrorBody)
                         .font(.system(size: 14, design: .rounded))
                         .foregroundColor(.inkBrown.opacity(0.7))
                         .multilineTextAlignment(.center)
@@ -62,7 +43,7 @@ struct NetworkErrorView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 15, weight: .bold))
-                        Text("Retry  /  重试")
+                        Text(lang.retry)
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                     }
                     .foregroundColor(.inkBrown)
@@ -78,7 +59,7 @@ struct NetworkErrorView: View {
                     AppSession.shared.teardownCloudServices()
                     AppMode.set(.local)
                 } label: {
-                    Text("Skip network (Use Local Mode)")
+                    Text(lang.skipNetwork)
                         .font(.system(size: 14, weight: .medium, design: .rounded))
                         .foregroundColor(.inkBrown.opacity(0.6))
                         .underline()
